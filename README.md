@@ -136,8 +136,9 @@ If the condition in an `if` statement evaluates into `false`, the code defined i
 var isTrue as boolean = false;
 var myVar as string;
 
-if (isTrue) then myVar = "It is true!" else myVar = "It is false!";
+if (isTrue) then myVar = "It is true!"; else myVar = "It is false!";
 ```
+
 
 ```java
 var isTrue as boolean = false;
@@ -265,7 +266,7 @@ switch (myDayInt) to {
 } 
 ```
 
-`Case` statements also allow multiple lines of code to run through the use of **code blocks**, similar to `if`, `else`, and `else if` statements.
+`Case` statements also allow multiple lines of code to run through the use of **code blocks**, similar to `if`, `else`, and `else if` statements:
 
 ```java
 var myAnimatCategory as string = "mammals";
@@ -289,5 +290,212 @@ switch (myAnimatCategory) to {
         myAnimalNames[1] = "dog";
         myAnimalNames[2] = "horse";
     }
+}
+```
+
+## Loops
+
+Loop statements in Porado help control flow by allowing iteration of the same code, making code more compact and dynamic. Loops in Porado include `while`, `do-while`, `until`, `do-until`, `for`, and `repeat` loops.
+
+### While & Do-While loops
+
+`While` and `do-while` loops iterate through a piece of code or **code block** while a condition remains `true`. A `while` loop first checks if the condition is `true` before executing its code; if it is `true` then it runs, otherwise it stops exit the `while` loop, potentially skipping its code. On the other hand, a `do-while` loop first executes its code then it checks its condition if it is true or not, allowing at least one iteration of its code to run.
+
+To declare a `while` loop, it has to be followed by a conditional enclosed in parenthesis `( )` and a `then` keyword. A `while` loop can run both a single piece of code or a **code block** for multiple lines of code:
+
+```java
+var myCounter as int = 0;
+
+while (myCounter < 100) then myCounter = myCounter + 1;
+```
+
+```java
+var myCounter as int = 0;
+var mySum as int = 0;
+
+while (myCounter < 5) then {
+    mySum = mySum + myCounter;
+    myCounter = myCounter + 1;
+};
+```
+
+Similarly, to declare a `do-while` loop, first write the `do` keyword followed by a line of code or a **code block**. After that, right the `then` keyword and the `while` keyword with a conditional enclosed in parenthesis `( )`:
+
+```java
+var myCounter as int = 0;
+
+do myCounter = myCounter + 1 then while (myCounter < 100);
+```
+
+```java
+var myCounter as int = 0;
+var mySum as int = 0;
+
+do {
+    mySum = mySum + myCounter;
+    myCounter = myCounter + 1;
+} then while (myCounter < 5);
+```
+
+### Until & Do-Until loops
+
+`Until` and `do-until` loops are exactly like `while` and `do-while` loops, except they only iterate through a piece of code or a **code block** until their condition becomes `true`. In other words, they only iterate through their code if the condition is `false`.
+
+The declaration of an `until` loop is syntactically the same as a `while` loop, except replace the `while` with an `until` keyword:
+
+```java
+var myCounter as int = 0;
+
+until (myCounter == 100) then myCounter = myCounter + 1;
+```
+
+```java
+var myCounter as int = 0;
+var mySum as int = 0;
+
+until (myCounter == 5) then {
+    mySum = mySum + myCounter;
+    myCounter = myCounter + 1;
+};
+```
+
+Likewise, a `do-until` loop also shared the same syntax as a `do-while` loop, only replacing the `while` keyword with an `until` keyword:
+
+```java
+var myCounter as int = 0;
+
+do myCounter = myCounter + 1 then until (myCounter == 100);
+```
+
+```java
+var myCounter as int = 0;
+var mySum as int = 0;
+
+do {
+    mySum = mySum + myCounter;
+    myCounter = myCounter + 1;
+} then until (myCounter == 5);
+```
+
+### For loops
+
+A `for` loop in Porado iterates through each element in a given list of elements, such as an array. To declare a `for` loop, first write the `for` keyword followed by the `each` keyword, and then parenthesis `( )` surrounding the **iteration variable**, the `in` keyword, and the **iteration list**. Lastly, write the piece of code or **code block** to execute.
+
+A `for` loop iterates its code a number of times equal to the length of the **iteration list**. Each element in the **iteration list** will be iterated through by the `for` loop by changing the **iteration variable** to the next every end of each iteration:
+
+```java
+var mySum as int = 0;
+
+for each (number in [1,2,3,4,5]) mySum = mySum + number;
+```
+
+A `for` loop can be used to populate an array:
+
+```java
+var myEmptyArray as int array of 30;
+var myCounter as int = 0;
+
+for each (element in myEmptyArray) {
+    element = myCounter;
+    myCounter = myCounter + 1;
+}
+```
+
+Nested `for` loops can also be used to conveniently access multi-dimensional arrays:
+
+```java
+var myEmptyArray as int array of 10 array of 10;
+var myCounter as int = 0;
+
+for each (subarray in myEmptyArray) {
+    for each (elements in subarray) {
+        elements = myCounter;
+        myCounter = myCounter + 1;
+    }
+}
+```
+
+```java
+var myEmptyArray as int array array array = [
+    [
+        [1,2,3],
+        [4,5,6],
+        [7,8,9]
+    ],
+    [
+        [1,2,3],
+        [4,5,6],
+        [7,8,9]
+    ],
+    [
+        [1,2,3],
+        [4,5,6],
+        [7,8,9]
+    ]
+];
+
+var myTotal as int = 0;
+
+for each (subarray1 in myEmptyArray) {
+    for each (subarray2 in subarray1) {
+        for each (number in subarray2) {
+            myTotal = myTotal + number;
+        }
+    }
+}
+```
+
+### Repeat loop
+
+A `repeat` loop in Porado is a simple loop that iterates its code a specified number of times. To declare a `repeat` loop, first write the `repeat` keyword followed by an `int` value enclosed in parenthesis `( )`. Lastly, write the piece of code or a **code block** to execute:
+
+```java
+var myCounter as int = 0;
+
+repeat (10) {
+    myCounter = myCounter + 1;
+}
+```
+
+You can also include an **iteration variable** in the repeat loop to use in cases where distinquishing the current iteration is important. You can do so by adding an `int` variable declaration with the  repeat amount `int` value both enclosed in the parenthesis `( )` but seperated by comma `,`. The **iteration variable** will be declared locally within the `repeat` loop, and it will be incremented by 1 automatically at each end of iteration.
+
+```java
+var myArraySize as int = 30
+var myArray as int array of myArraySize;
+
+repeat (var i as int = 0, myArraySize) {
+    myArray[i] = i;
+}
+```
+
+### Break & Continue
+
+The `break` and `continue` keywords in Porado creates more advanced control flow by alterning the behavior of most loops, such as skipping over certain iterations or just ending the loop early.
+
+The `break` keyword tells the loop to stop and exit immediately, skipping all incoming iterations, if any. On the other hand, the `continue` keyword, immediately ends the current iteration and jump to the next one, skipping over any left-over code in the **code block**:
+
+```java
+var myVar as int = 0;
+
+while (true) then {
+    myVar = myVar + 1;
+    if (myVar > 100) then break;
+}
+```
+
+```java
+var myNumArray as int array = [2,4,6,5,8,10,12];
+
+for each (number in myNumArray) {
+    if (number % 2 == 0) then continue else break;
+}
+```
+
+```java
+var mySum as int = 0;
+
+repeat (var i as int = 0; 100) {
+    if (i % 2 == 0) then continue;
+    mySum = mySum + i;
 }
 ```
