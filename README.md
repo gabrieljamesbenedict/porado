@@ -100,6 +100,24 @@ myEmptyMultiArray[0][0] = 1;
 myEmptyMultiArray[1][2] = 1;
 ```
 
+### Fixed Arrays
+
+An array can be declared as immutable and read-only by adding a `fixed` keyword before the data type while also adding the `array` keyword after the data type. A fixed array cannot be assigned a new list of values. The elements of a fixed array are also considered as fixed variables, so you cannot change the values of an element of a fixed array.
+
+```java
+var myFixedArray as fixed int array;
+myFixedArray = [1,2,3,4,5];
+
+myFixedArray = [6,7,8,9,0]; // Compile-time error
+```
+
+```java
+var myFixedArray as fixed int array;
+myFixedArray = [1,2,3,4,5];
+
+myFixedArray[0] = 100; // Compile-time error
+```
+
 ## Conditionals
 
 Conditional statements in Porado include `if`, `else`, and `switch` statements that help guide control flow when the code runs.
