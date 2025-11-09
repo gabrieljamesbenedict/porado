@@ -170,7 +170,7 @@ if (myBool1) then {
 }
 ```
 
-You can combine `if`, `else`, and `else if` statements, but within a single chain, there can only be one initial `if` statement, followed by zero or more `else if` statments, and an optional `else` statement:
+You can combine `if`, `else`, and `else if` statements, but within a single chain, there can only be one initial `if` statement, followed by zero or more `else if` statements, and an optional `else` statement:
 
 ```java
 var myDayInt as int = 4;
@@ -195,7 +195,7 @@ if (myDayInt == 1) then {
 }
 ```
 
-You can omit redundant parenthesis by not using** code blocks** if there is only one line of code in each statement. This can greatly improve readability:
+You can omit redundant code blocks if there is only one line of code in each statement. This can greatly improve readability:
 
 ```java
 if (myDayInt == 1) then myDayString = "Monday";
@@ -212,7 +212,7 @@ else myDayString = "Unknown Day";
 
 Long chains of `if`, `else`, and `else if` statements can be cumbersome, so the alternative is to use `switch` statements. To declare a `switch` statement, you need to write a condition surrounded by parenthesis `( )` followed by a `to` keyword. Naturally, you use a **code block** to define multiple `case` statements, declared as `case` followed by parenthesis `( )` with a target value inside.
 
-`Switch` statements in Porado do not fall through; each `switch` statement picks a single `case` statement to run depending on its conditional value. The `switch` statement reads the conditional value and picks a corresponding `case` statement with an equal target value. A `case` statement cannot have duplicate target values.
+`Switch` statements in Porado do not fall through; a `switch` statement selects only one branch of code to execute based on a `case` statement with a matching target value. `Case` statements cannot have duplicate target values.
 
 An optional `default` statement, which is a special `case` statement, can be added to the `switch` statement. If no `case` statements are picked by the `switch` statement, the `default` statement is chosen if it exists. There can only be one `default` statement inside a single `switch` statement:
 
