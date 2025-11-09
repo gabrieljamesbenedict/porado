@@ -183,9 +183,9 @@ var myBool2 as boolean = true;
 var myName as string;
 
 if (myBool1) then {
-    myName = "John"; // This code won't run.
+    myName = "John"; // This code won't run
 } else if (myBool2) then {
-    myName = "Doe"; // This code will run.
+    myName = "Doe"; // This code will run
 }
 ```
 
@@ -243,7 +243,7 @@ switch (myDayInt) to {
     case(1) myDayString = "Monday";
     case(2) myDayString = "Tuesday";
     case(3) myDayString = "Wednesday";
-    case(4) myDayString = "Thursday"; // Runs this code only.
+    case(4) myDayString = "Thursday"; // Runs this code only
     case(5) myDayString = "Friday";
     case(6) myDayString = "Saturday";
     case(7) myDayString = "Sunday";
@@ -263,7 +263,7 @@ switch (myDayInt) to {
     case(5) yDayString = "Friday";
     case(6) yDayString = "Saturday";
     case(7) yDayString = "Sunday";
-    default myDayString = "Unknown Day"; // Runs this code only.
+    default myDayString = "Unknown Day"; // Runs this code only
 } 
 ```
 
@@ -273,7 +273,7 @@ var myDayString as string;
 
 switch (myDayInt) to {
     case(1) yDayString = "Monday";
-    case(1) yDayString = "Monday"; // Compile-time error.
+    case(1) yDayString = "Monday"; // Compile-time error
     case(2) yDayString = "Tuesday";
     case(3) yDayString = "Wednesday";
     case(4) yDayString = "Thursday";
@@ -337,7 +337,7 @@ while (myCounter < 5) then {
 };
 ```
 
-Similarly, to declare a `do-while` loop, first write the `do` keyword followed by a line of code or a **code block**. After that, right the `then` keyword and the `while` keyword with a conditional enclosed in parenthesis `( )`:
+Similarly, to declare a `do-while` loop, first write the `do` keyword followed by a line of code or a **code block**. After that, write the `then` keyword and the `while` keyword with a conditional enclosed in parenthesis `( )`:
 
 ```java
 var myCounter as int = 0;
@@ -377,7 +377,7 @@ until (myCounter == 5) then {
 };
 ```
 
-Likewise, a `do-until` loop also shared the same syntax as a `do-while` loop, only replacing the `while` keyword with an `until` keyword:
+Likewise, a `do-until` loop also shares the same syntax as a `do-while` loop, only replacing the `while` keyword with an `until` keyword:
 
 ```java
 var myCounter as int = 0;
@@ -407,7 +407,7 @@ var mySum as int = 0;
 for each (number in [1,2,3,4,5]) mySum = mySum + number;
 ```
 
-A `for` loop can be used to populate an array:
+A `for` loop can be used to modify an array. In Porado, a `for` loop binds the **iteration variable** as reference to each element from the **iteration list**. Assigning to the **iteration variable** will directly modify the list contents. Be careful on using this on fixed arrays, as its elements are also fixed and mutating it can cause errors:
 
 ```java
 var myEmptyArray as int array of 30;
@@ -415,6 +415,16 @@ var myCounter as int = 0;
 
 for each (element in myEmptyArray) {
     element = myCounter;
+    myCounter = myCounter + 1;
+}
+```
+
+```java
+var myEmptyArray as int fixed array = [1,2,3,4,5];
+var myCounter as int = 0;
+
+for each (element in myEmptyArray) {
+    element = myCounter; // Compile-time error
     myCounter = myCounter + 1;
 }
 ```
@@ -475,7 +485,7 @@ repeat (10) {
 }
 ```
 
-You can also include an **iteration variable** in the repeat loop to use in cases where distinquishing the current iteration is important. You can do so by adding an `int` variable declaration with the  repeat amount `int` value both enclosed in the parenthesis `( )` but seperated by comma `,`. The **iteration variable** will be declared locally within the `repeat` loop, and it will be incremented by 1 automatically at each end of iteration.
+You can also include an **iteration variable** in the repeat loop to use in cases where distinquishing the current iteration is important. You can do so by adding an `int` variable declaration with the  repeat amount `int` value both enclosed in the parenthesis `( )` but separated by comma `,`. The **iteration variable** will be declared locally within the `repeat` loop, and it will be incremented by 1 automatically at each end of iteration.
 
 ```java
 var myArraySize as int = 30
@@ -488,7 +498,7 @@ repeat (var i as int = 0, myArraySize) {
 
 ### Break & Continue
 
-The `break` and `continue` keywords in Porado creates more advanced control flow by alterning the behavior of most loops, such as skipping over certain iterations or just ending the loop early.
+The `break` and `continue` keywords in Porado creates more advanced control flow by altering the behavior of most loops, such as skipping over certain iterations or just ending the loop early.
 
 The `break` keyword tells the loop to stop and exit immediately, skipping all incoming iterations, if any. On the other hand, the `continue` keyword, immediately ends the current iteration and jump to the next one, skipping over any left-over code in the **code block**:
 
