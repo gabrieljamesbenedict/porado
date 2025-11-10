@@ -542,93 +542,49 @@ repeat (var i as int = 0; 100) {
 
 ## Functions
 
-Functions can help encapsulate logic into manageable and reusable pieces and help give clarity to large codebases. In Porado, to make an function you must use the `func` keyword at the beginning and then provide the function identifier. Afterwards, write the `accepts` keyword followed by parenthesis `( )` which may contain none or more variable or array declarations. These variables are the **input parameters** of the function. Next, write the `returns` keyword followed by another parenthesis `( )` which may contain only one variable or array declaration. This is the **output or return parameter** of the function. The **input** and **output parameters** are all local to the function. If a function does not have any **input** or **output parameters**, you may omit the `accepts` or `returns` keywords respectively. The function body, usually a **code block**, determines what code executes when the function is called.
+Functions can help encapsulate logic into manageable and reusable pieces and help give clarity to large codebases. In Porado, to make an function you must use the `func` keyword at the beginning and then provide the function identifier. Afterwards, write the `accepts` keyword followed by parenthesis `( )` which may contain none or more variable or array declarations. These variables are the **input parameters** of the function. Next, write the `returns` keyword followed by the **return type**. The **input parameters** are all local to the function. If a function does not have any **input parameters** or **return type**, you may omit the `accepts` or `returns` keywords respectively. The function body, usually a **code block**, determines what code executes when the function is called.
+
+To call a function, use its identifier followed by parenthesis `( )` sticking to the identifier. If the function has any **input parameters**, make sure to include the same number of arguments within the parenthesis `( )`, and each argument are of matching type to its parameter:
+
+The function call ends when it finishes executing all code within the function body, or when it encounters a `return` keyword. For functions with a **return type**, a `return` keyword followed by a value or variable that has the same data type as the **return type** is mandatory for all control flow end paths of the function.
 
 ```java
-// Function with both input and output parameters
-func <identifier> accepts (<input-parameters>) returns (<output-parameter>) {
-    // code...
+func adder accepts (var a as int, var b as int) returns int {
+    return a + b;
 }
 
-// Function with only input parameters
-func <identifier> accepts (<input-parameters>) {
-    // code...
-}
 
-// Function with only output parameters
-func <identifier> returns (<output-parameter>) {
-    // code...
-}
-
-// Function with neither input and output parameters
-func <identifier> {
-    // code...
-}
+var myVar1 as int = 10;
+var myVar2 as int = 25;
+var mySum as int = adder(myVar1, myVar2); // mySum == 35
 ```
 
-### Pass by value
+### Passing by reference
 
-The **input parameters** are always copied by value by default, not by reference, so changing the **input parameter** variables will have no effect to the variable outside the function. When the function body finishes execution, it always returns the value of the **output parameter**. If the output parameter was not initialized before the function ends, it returns its default value based on its data type. More details at the **Data Types** section
-
-To call a function, use its identifier followed by parenthesis `( )`, and make sure they are not seperated by any whitespace. If the function has any **input parameters**, make sure to include the same number of arguments within the parenthesis `( )`, and each argument are of matching type to the parameter:
+Functions in Porado, by default, pass its **input parameters** by value. This means that the parameters are copies of the arguments and modifying them inside the function won't affect the external variable. To allow for a function to have **input parameters** passed by reference, you can append a `reference` keyword after the data type in the parameter declaration:
 
 ```java
-func add accepts (var a as int, var b as int) returns (var sum as int) {
-    sum = a + b;
-}
-
-var myNum1 as int = 10;
-var myNum2 as int = 15;
-
-var mySum = add(myNum1, myNum2); // mySum == 25
-```
-
-### Pass by reference
-
-To pass an **input parameter** by reference, append a `reference` keyword at the end of your variable declaration right after the data type to specify that the **input parameter** is a direct refernce to the argument. This will allow any changes dont to the **input parameter** to also modify the variable argument outside the function:
-
-```java
-func square accepts (var num as int reference) {
+func square (var num as int reference) {
     num = num * num;
 }
 
-var myNum as int = 6;
 
-square(myNum); // myNum == 36
-```
-
-### Return early
-
-You can end a function early in Porado by using the `return` keyword. This forces the function to immediately stop running and return the current value of the **output parameter**, or its default value if it was never initialized before the function ended. More details at the **Data Types** section:
-
-```java
-func allEven accepts (var arr as int array) returns (var ret as boolean) {
-    ret = true;
-    for (num in arr) {
-        if (num % 2 != 0) then {
-            ret = false;
-            return;
-        };
-    }
-}
-
-var myNumArray as int array = [2,4,6,8,10,11];
-var myBool as boolean;
-
-myBool = allEven(myNumArray); // myBool == false
+var myVar as int = 7;
+square(myVar); // myVar == 49
 ```
 
 ### Recursion
 
-Functions in Porado are able to call themselves to achieve recursion, which can be used to solve a variety of problems:
+Porado allows function recursion, which is when a function calls itself as a way to solve specific problems:
 
 ```java
-func factorial accepts (int num as int) returns (int fact as int) {
-    if (num == 1) then {
-        fact = 1;
-        return;
-    }
+func factorial accepts (var num as int) returns int {
+    if (num == 1) then return 1;
 
-    fact = num * factorial(num - 1);
+    return num * factorial(num - 1);
 }
+
+var myNum as int = 5;
+var myFact as int = factorial(myNum); // myFact = 120
 ```
+
