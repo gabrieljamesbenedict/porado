@@ -33,6 +33,18 @@ goldenRatio = 1.61803398875;
 goldenRatio = 123; // Compile-time error
 ```
 
+### Strict Variables
+
+A variable can be declared as strict by adding the `strict` keyword before the data type. A strict variable does not have default values defined by its data type and will throw a runtime error when the program tries to access it withtout initializing it first.
+
+```java
+var myStrictString as strict string = "Hello!";
+var myOtherString as string = myStrictVar; // Runs with no errors
+
+var myStrictFloat as strict float;
+var myOtherFloat as float = myStrictVar; // Compile-time error
+```
+
 ### Arrays
 
 An array can hold multiple variables of the same type. You can access a specific element of an array using its array index, which start at 0 to represent the first element. To declare an array, you add the `array` keyword after the data type. An array in Porado uses the square braces `[ ]` to declare its elements. You can't access elements outside the array's length:
