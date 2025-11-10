@@ -1,3 +1,40 @@
+# Table of Contents
+- [Table of Contents](#table-of-contents)
+- [Porado](#porado)
+  - [Expressions](#expressions)
+    - [Atomic Expressions](#atomic-expressions)
+      - [Literal Expressions](#literal-expressions)
+      - [Identifier Expressions](#identifier-expressions)
+      - [Grouping Expressions](#grouping-expressions)
+    - [Arithmetic Expressions](#arithmetic-expressions)
+    - [Assignment Expressions](#assignment-expressions)
+    - [Comparison Expressions](#comparison-expressions)
+    - [Logical Expressions](#logical-expressions)
+    - [Function Expressions](#function-expressions)
+    - [Array Access Expression](#array-access-expression)
+    - [Unary Expressions](#unary-expressions)
+  - [Variables](#variables)
+    - [Strict Variables](#strict-variables)
+    - [Fixed Variables](#fixed-variables)
+    - [Arrays](#arrays)
+    - [Multi-dimensional Arrays](#multi-dimensional-arrays)
+    - [Fixed Arrays](#fixed-arrays)
+  - [Conditionals](#conditionals)
+    - [If statements](#if-statements)
+    - [Else statements](#else-statements)
+    - [Else If statements](#else-if-statements)
+    - [Switch statements](#switch-statements)
+  - [Loops](#loops)
+    - [While \& Do-While loops](#while--do-while-loops)
+    - [Until \& Do-Until loops](#until--do-until-loops)
+    - [For loops](#for-loops)
+    - [Repeat loop](#repeat-loop)
+    - [Break \& Continue](#break--continue)
+  - [Functions](#functions)
+    - [Passing by reference](#passing-by-reference)
+    - [Recursion](#recursion)
+
+
 # Porado
 
 Porado is a simple programming language that compiles to native assembly.
@@ -703,4 +740,3 @@ func factorial accepts (var num as int) returns int {
 var myNum as int = 5;
 var myFact as int = factorial(myNum); // myFact = 120
 ```
-
