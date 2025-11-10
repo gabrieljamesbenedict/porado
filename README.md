@@ -37,6 +37,13 @@ print
 
 A grouped expression is any expression wrapped inside parenthesis `( )`. The expression wrapped inside the parenthesis has higher precedence in order of evaluation.
 
+```java
+(1+2)
+((a+b) - c)
+(x*y)*(x/y)
+((a+b+c)+(100-x))+(num)
+```
+
 ### Arithmetic Expressions
 
 An arithmetic expression is composed of literals, identifiers, groupings, arithmetic operators, and other arithmetic expressions. An arithmetic expression can be reduced down to a numerical literal.
