@@ -12,13 +12,19 @@
     - [Logical Expressions](#logical-expressions)
     - [Function Expressions](#function-expressions)
     - [Array Access Expression](#array-access-expression)
-    - [Unary Expressions](#unary-expressions)
   - [Variables](#variables)
     - [Strict Variables](#strict-variables)
     - [Fixed Variables](#fixed-variables)
     - [Arrays](#arrays)
     - [Multi-dimensional Arrays](#multi-dimensional-arrays)
     - [Fixed Arrays](#fixed-arrays)
+  - [Data Types](#data-types)
+  - [Operators](#operators)
+    - [Arithmetic Operators](#arithmetic-operators)
+      - [Negative Sign](#negative-sign)
+    - [Assignment Operators](#assignment-operators)
+    - [Comparison Operators](#comparison-operators)
+    - [Logical Operators](#logical-operators)
   - [Conditionals](#conditionals)
     - [If statements](#if-statements)
     - [Else statements](#else-statements)
@@ -147,17 +153,6 @@ myCollection[size - 1]
 myList[x] > myList[x+1]
 ```
 
-### Unary Expressions
-
-Unary expressions include negative expressions `-` and logical `not` expressions. Unary expressions are evaluated at a higher precedence than binary operators.
-
-```java
--5 + 1
-(x + y) * -2
-not (bool1 or bool2)
-not myBool and not myVar
-```
-
 ## Variables
 
 Variables in Porado are statically typed. To declare a variable, first write the `var` keyword followed by the variable identifier. Then write the `as` keyword followed by the variable data type. Variables can be instantiated at declaration, or later in the code by calling its identifier:
@@ -280,6 +275,85 @@ myFixedArray = [1,2,3,4,5];
 
 myFixedArray[0] = 100; // Compile-time error
 ```
+
+## Data Types
+
+Porado has a couple basic data types that cover most use cases in programming. Available data types include `int`, `float`, `char`, `string`, and `boolean`. The default value of a data type is the value it takes when a variable of that data type gets used without being initialized. A [strict variable](#strict-variables) does not take a default value, instead it becomes null when initially declared and not assigned a value. Accessing a strict variable while it is null results in a runtime error.
+
+| Data Type | Description | Default Value |
+|:---------:|:------------|:-------------:|
+| int | 32-bit signed integer value | 0
+| float | 32-bit signed floating point value | 0.0 |
+| char | 8-bit ASCII character | '' |
+| string | UTF-8 encoded sequence of char values | "" |
+| boolean | Logical truth value (true or false) | false |
+
+## Operators
+
+Operators in Porado are used to compute data in a wide range of scenarious. There are many kinds of operators available in Porado, including `arithmetic`, `assignment`, `comparison`, and `logical` operators.
+
+### Arithmetic Operators
+
+Arithmetic operators performs computations between two numerical literals or expressions.
+
+| Operator | Name | Description | Format |
+|:--------:|:-----|:-----------:|:------:|
+| + | Addition | Adds two values | A + B |
+| - | Subtraction | Subtracts one value from the other | A - B |
+| * | Multiplication | Mutliples two values | A * B |
+| / | Division | Divides one value by the other | A / B |
+| % | Modulo | Returns the division remainder | A % B |
+| ++ | Increment | Unary operation, add 1 to value | A++ |
+| -- | Decrement | Unary operation, remove 1 from value | A-- |
+
+#### Negative Sign
+
+The negative sign is a special unary arithmetic operation that has the same symbo as Subtraction. It inverts the sign of the a numerical value.
+
+| Operator | Name | Description | Format |
+|:--------:|:-----|:-----------:|:------:|
+| - | Negative Sign | Unary operation, inverts the sign of a value | -A |
+
+### Assignment Operators
+
+Assignment operations are used to initialize variables with value.
+
+| Operator | Name | Description | Format |
+|:--------:|:-----|:-----------:|:------:|
+| = | Normal Assignment | Assigns a value to a variable | A = B |
+| += | Addition Assignment | Assigns a variable the sum of itself and another value | A += B |
+| -= | Subtraction Assignment | Assigns a variable the difference of itself and another value | A -= B |
+| *= | Multiplication Assignment | Assigns a variable the product of itself and another value | A *= B |
+| /= | Division Assignment | Assigns a variable the quotient of itself and another value | A /= B |
+| %= | Modulo Assigment | Assigns a variable the remainder of the division of itself and another value | A %= B |
+
+### Comparison Operators
+
+Comparison operators compares two numerical values and evaluates either `true` or `false`.
+
+| Operator | Name | Description | Format |
+|:--------:|:-----|:-----------:|:------:|
+| == | Equals | Returns `true` if both values are numerically equal; otherwise returns `false` | A == B |
+| != | Not Equals | Returns `false` if both values are numerically equal; otherwise returns `true` | A != B |
+| > | Greater Than | Returns `true` if first value is numerically larger than second value; otherwise returns `false` | A > B |
+| < | Less Than | Returns `true` if first value is numerically smaller than second value; otherwise returns `false` | A < B |\
+| >= | Greater Than Or Equals | Returns `true` if first value is numerically larger than or equal to second value; otherwise returns `false` | A >= B |
+| <= | Less Than Or Equals | Returns `true` if first value is numerically smaller than or equal to second value; otherwise returns `false` | A <= B |
+
+### Logical Operators
+
+Logical operators compares two boolean values and evaluates either Comparison operators compares two numerical values and evaluates either `true` or `false`.
+
+| Operator | Name | Description | Format |
+|:--------:|:-----|:-----------:|:------:|
+| not | Logical NOT | Unary operator, inverses the truth value of a boolean variable or literal | not A |
+| and | Logical AND | Returns `true` if both values are `true`; otherwise returns `false` | A and B |
+| nand | Logical NAND | Returns `false` if both values are `true`; otherwise returns `true` | A and B |
+| or | Logical OR | Returns `true` if at least one value is `true`; otherwise returns `false` | A or B |
+| nor | Logical NOR | Returns `true` if both values are `false`; otherwise returns `false` | A nor B |
+| xor | Logical XOR | Returns `true` only if values are different; otherwise returns `false` | A xor B |
+| xnor | Logical XNOR | Returns `true` only if values are the same; otherwise returns `false` | A xnor B |
+
 
 ## Conditionals
 
