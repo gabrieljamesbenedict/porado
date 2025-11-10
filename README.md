@@ -2,6 +2,118 @@
 
 Porado is a simple programming language that compiles to native assembly.
 
+## Expressions
+
+Expressions are the backbone of any programming language. It is a combination of letters, numbers, symbols, or other expressions and operators. A program in Porado is made up of several expressions of varying kinds.
+
+### Atomic Expressions
+
+An atomic expression is the most basic expression that cannot be broken down further into other smaller and simpler expressions. This includes literal and identifier expressions
+
+#### Literal Expressions
+
+A literal expression is composed of alphanumeric digits, decimal points, and quotation marks to represent real, constant values such as integers, floating points, characters, strings, or booleans.
+
+```java
+10
+23.5
+'a'
+"hello world"
+false
+```
+
+#### Identifier Expressions
+
+An identifier expression is made up of alphanumeric digits and other symbols that represent a variable, array, or function, in the program. An identifier must start with a letter or an underscore, and must not contain spaces.
+
+```java
+x
+myNum
+myArray
+print
+```
+
+#### Grouping Expressions
+
+A grouped expression is any expression wrapped inside parenthesis `( )`. The expression wrapped inside the parenthesis has higher precedence in order of evaluation.
+
+### Arithmetic Expressions
+
+An arithmetic expression is composed of literals, identifiers, groupings, arithmetic operators, and other arithmetic expressions. An arithmetic expression can be reduced down to a numerical literal.
+
+```java
+1 + 4
+13.5 / 3.6
+num1 + num2
+(a + 4) + (10 - b)
+```
+
+### Assignment Expressions
+
+An assignment expression is composed of literals, identifiers, groupings, the assignment operator, and other expressions that can be reduced to a literal. The left hand side must not be a literal. There can only be one identifier expression in the left hand side. There can only be one assignment operator in an assignment expression.
+
+```java
+x = 5
+num1 = num2
+myVar = 1 + 2 + 3
+msg = "hello world"
+```
+
+### Comparison Expressions
+
+A comparison expression is composed of literals, identifiers, groupings, a comparison operator, and other expressions that can be reduced to a literal. The right hand side and the left hand side must be a numerical literal or reducable to a numerical literal. There can only be one comparison operator in an comparison expression. A comparison expression can be reduced to a boolean literal expression.
+
+```java
+4 > 6
+num1 == num2
+(x + 10) >= 56
+(x * y) != 100
+```
+
+### Logical Expressions
+
+A logical expression is composed of literals, identifiers, groupings, a logical operator, and other expressions that can be reduced to a literal. The right hand side and left hand side must be a boolean literal or reducable to a boolean literal. There can only be one logical operator in a logical expression. A logical expression can be reduced to a boolean literal expression.
+
+```java
+true or false
+(myBoolean and true) or not myVar
+bool1 nor bool2 nand bool3
+myBool xor (myBool xnor false)
+```
+
+### Function Expressions
+
+A function expression is composed of a function identifier immediately followed by parenthesis `( )` containing zero or more argument expressions seperated by comma `,`. Each argument inside a function call is evaluated before the function expression. A function can be reduced to a literal if it has a return value. A function expression evaluates to the return value of the function it calls. If the function it calls has no return type, the function expresssion simply executes its code.
+
+```java
+print("hello world")
+add(10 + b)
+square(num)
+factorial(5)
+```
+
+### Array Access Expression
+
+An array access expression is composed of an array identifier immediately followed by parenthesis `( )` containing an integer literal or an expression reducable to an integer literal. The array access expression evaluates into the element of the array.
+
+```java
+myArray[4]
+myNums[i]
+myCollection[size - 1]
+myList[x] > myList[x+1]
+```
+
+### Unary Expressions
+
+Unary expressions include negative expressions `-` and logical `not` expressions. Unary expressions are evaluated at a higher precedence than binary operators.
+
+```java
+-5 + 1
+(x + y) * -2
+not (bool1 or bool2)
+not myBool and not myVar
+```
+
 ## Variables
 
 Variables in Porado are statically typed. To declare a variable, first write the `var` keyword followed by the variable identifier. Then write the `as` keyword followed by the variable data type. Variables can be instantiated at declaration, or later in the code by calling its identifier:
