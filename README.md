@@ -4,18 +4,25 @@ Porado is a simple programming language that compiles to native assembly.
 
 ## Variables
 
-Variables in Porado have strict static typing. Variable declaration requires developers to specify the data type and variable identifier in the following format:
-
-```java
-var <identifier> as <data-type>;
-```
-
-Variables can be instantiated at declaration, or later in the code by calling its identifier:
+Variables in Porado are statically typed. To declare a variable, first write the `var` keyword followed by the variable identifier. Then write the `as` keyword followed by the variable data type. Variables can be instantiated at declaration, or later in the code by calling its identifier:
 
 ```java
 var myVariable1 as int = 12345;
+
 var myVariable2 as float;
 myVariable2 = 123.45;
+```
+
+### Strict Variables
+
+A variable can be declared as strict by adding the `strict` keyword before the data type. A strict variable does not have default values defined by its data type and will throw a runtime error when the program tries to access it withtout initializing it first.
+
+```java
+var myStrictString as strict string = "Hello!";
+var myOtherString as string = myStrictVar; // Runs with no errors
+
+var myStrictFloat as strict float;
+var myOtherFloat as float = myStrictVar; // Compile-time error
 ```
 
 An uninitialized variable will use its default value when its identifier is called. More details at the **Data Types** section.
@@ -31,18 +38,6 @@ PI = 3; // Compile-time error
 var goldenRatio as fixed float;
 goldenRatio = 1.61803398875;
 goldenRatio = 123; // Compile-time error
-```
-
-### Strict Variables
-
-A variable can be declared as strict by adding the `strict` keyword before the data type. A strict variable does not have default values defined by its data type and will throw a runtime error when the program tries to access it withtout initializing it first.
-
-```java
-var myStrictString as strict string = "Hello!";
-var myOtherString as string = myStrictVar; // Runs with no errors
-
-var myStrictFloat as strict float;
-var myOtherFloat as float = myStrictVar; // Compile-time error
 ```
 
 ### Arrays
@@ -561,16 +556,18 @@ var mySum as int = adder(myVar1, myVar2); // mySum == 35
 
 ### Passing by reference
 
-Functions in Porado, by default, pass its **input parameters** by value. This means that the parameters are copies of the arguments and modifying them inside the function won't affect the external variable. To allow for a function to have **input parameters** passed by reference, you can append a `reference` keyword after the data type in the parameter declaration:
+Functions in Porado, by default, pass its **input parameters** by value. This means that the parameters are copies of the arguments and modifying them inside the function won't affect the external variable. To allow for a function to have **input parameters** passed by reference, you can append a `reference` keyword after the data type in the parameter declaration. Passing in a literal or such as a reference will result in a runtime error:
 
 ```java
-func square (var num as int reference) {
+func square accepts (var num as int reference) {
     num = num * num;
 }
 
 
 var myVar as int = 7;
 square(myVar); // myVar == 49
+
+square(10); // Runtime error
 ```
 
 ### Recursion
