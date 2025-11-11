@@ -1,12 +1,17 @@
-cd ..
-rmdir /s /q "compiler-builds/porado"
+
+cd ../compiler-builds
+rmdir /s /q "porado"
+del "porado.rar"
+
 jpackage ^
-  --input ./target/ ^
-  --dest ./compiler-builds/ ^
+  --input ../target/ ^
+  --dest ./ ^
   --name porado ^
   --main-jar porado-compiler-1.jar ^
   --main-class com.gabrieljamesbenedict.PoradoCompiler ^
   --type app-image ^
   --win-console
+
+rar a -r "porado.rar" "porado"
 
 pause
