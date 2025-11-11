@@ -1,5 +1,9 @@
+cd ..
+call mvn clean install
 
-cd ../compiler-builds
+echo "MAVEN BUILD DONE"
+
+cd compiler-builds
 rmdir /s /q "porado"
 del "porado.rar"
 
