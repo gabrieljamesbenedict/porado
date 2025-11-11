@@ -1,284 +1,96 @@
-# Table of Contents
-- [Table of Contents](#table-of-contents)
+# Porado
 - [Porado](#porado)
-  - [Expressions](#expressions)
-    - [Atomic Expressions](#atomic-expressions)
-      - [Literal Expressions](#literal-expressions)
-      - [Identifier Expressions](#identifier-expressions)
-      - [Grouping Expressions](#grouping-expressions)
-    - [Arithmetic Expressions](#arithmetic-expressions)
-    - [Assignment Expressions](#assignment-expressions)
-    - [Comparison Expressions](#comparison-expressions)
-    - [Logical Expressions](#logical-expressions)
-    - [Function Expressions](#function-expressions)
-    - [Array Access Expression](#array-access-expression)
+  - [Introduction](#introduction)
+  - [Comments](#comments)
+    - [Single-line Comments](#single-line-comments)
+    - [Multi-line Comments](#multi-line-comments)
   - [Variables](#variables)
+    - [Data Types](#data-types)
     - [Strict Variables](#strict-variables)
     - [Fixed Variables](#fixed-variables)
-    - [Arrays](#arrays)
-    - [Multi-dimensional Arrays](#multi-dimensional-arrays)
+  - [Arrays](#arrays)
+    - [Multi-Dimensional Arrays](#multi-dimensional-arrays)
+    - [Strict Arrays](#strict-arrays)
     - [Fixed Arrays](#fixed-arrays)
-  - [Data Types](#data-types)
   - [Operators](#operators)
     - [Arithmetic Operators](#arithmetic-operators)
-      - [Negative Sign](#negative-sign)
+      - [Unary Arithmetic Operators](#unary-arithmetic-operators)
     - [Assignment Operators](#assignment-operators)
     - [Comparison Operators](#comparison-operators)
     - [Logical Operators](#logical-operators)
+    - [Order of Precedence](#order-of-precedence)
   - [Conditionals](#conditionals)
-    - [If statements](#if-statements)
-    - [Else statements](#else-statements)
-    - [Else If statements](#else-if-statements)
-    - [Switch statements](#switch-statements)
+    - [If](#if)
+    - [Else](#else)
+    - [Else If](#else-if)
+  - [Switch](#switch)
   - [Loops](#loops)
-    - [While \& Do-While loops](#while--do-while-loops)
-    - [Until \& Do-Until loops](#until--do-until-loops)
-    - [For loops](#for-loops)
-    - [Repeat loop](#repeat-loop)
+    - [While](#while)
+    - [Do While](#do-while)
+    - [Until](#until)
+    - [Do Until](#do-until)
+    - [For](#for)
+    - [Repeat](#repeat)
     - [Break \& Continue](#break--continue)
+      - [Break](#break)
+      - [Continue](#continue)
   - [Functions](#functions)
-    - [Passing by reference](#passing-by-reference)
     - [Recursion](#recursion)
 
 
-# Porado
+## Introduction
 
-Porado is a simple programming language that compiles to native assembly.
+Porado is a simple and fun programming language that takes the traditional syntax inspired from the C family of programming languages and blends it with natural English speech to achieve code that is both intuitive and effective.
 
-## Expressions
+## Comments
 
-Expressions are the backbone of any programming language. It is a combination of letters, numbers, symbols, or other expressions and operators. A program in Porado is made up of several expressions of varying kinds.
+Comments are ignored by the compiler and are used to explain or temporarily remove code. 
 
-### Atomic Expressions
+### Single-line Comments
 
-An atomic expression is the most basic expression that cannot be broken down further into other smaller and simpler expressions. This includes literal and identifier expressions
+A single line comment can be made using two forward slashes `//`. The entire line starting from the `//` is ignored by the compiler.
 
-#### Literal Expressions
-
-A literal expression is composed of alphanumeric digits, decimal points, and quotation marks to represent real, constant values such as integers, floating points, characters, strings, or booleans.
-
-```java
-10
-23.5
-'a'
-"hello world"
-false
+```js
+// This line is ignored!
+num as int; // This part is ignored!
 ```
 
-#### Identifier Expressions
+### Multi-line Comments
 
-An identifier expression is made up of alphanumeric digits and other symbols that represent a variable, array, or function, in the program. An identifier must start with a letter or an underscore, and must not contain spaces.
+To comment out multiple lines, use `/* */`. Any text between these two symbols are commented out and ignored by the compiler.
 
-```java
-x
-myNum
-myArray
-print
-```
+```js
+/*
 
-#### Grouping Expressions
+This entire area is ignored!
 
-A grouped expression is any expression wrapped inside parenthesis `( )`. The expression wrapped inside the parenthesis has higher precedence in order of evaluation.
+*/
 
-```java
-(1+2)
-((a+b) - c)
-(x*y)*(x/y)
-((a+b+c)+(100-x))+(num)
-```
-
-### Arithmetic Expressions
-
-An arithmetic expression is composed of literals, identifiers, groupings, arithmetic operators, and other arithmetic expressions. An arithmetic expression can be reduced down to a numerical literal.
-
-```java
-1 + 4
-13.5 / 3.6
-num1 + num2
-(a + 4) + (10 - b)
-```
-
-### Assignment Expressions
-
-An assignment expression is composed of literals, identifiers, groupings, the assignment operator, and other expressions that can be reduced to a literal. The left hand side must not be a literal. There can only be one identifier expression in the left hand side. There can only be one assignment operator in an assignment expression.
-
-```java
-x = 5
-num1 = num2
-myVar = 1 + 2 + 3
-msg = "hello world"
-```
-
-### Comparison Expressions
-
-A comparison expression is composed of literals, identifiers, groupings, a comparison operator, and other expressions that can be reduced to a literal. The right hand side and the left hand side must be a numerical literal or reducable to a numerical literal. There can only be one comparison operator in an comparison expression. A comparison expression can be reduced to a boolean literal expression.
-
-```java
-4 > 6
-num1 == num2
-(x + 10) >= 56
-(x * y) != 100
-```
-
-### Logical Expressions
-
-A logical expression is composed of literals, identifiers, groupings, a logical operator, and other expressions that can be reduced to a literal. The right hand side and left hand side must be a boolean literal or reducable to a boolean literal. There can only be one logical operator in a logical expression. A logical expression can be reduced to a boolean literal expression.
-
-```java
-true or false
-(myBoolean and true) or not myVar
-bool1 nor bool2 nand bool3
-myBool xor (myBool xnor false)
-```
-
-### Function Expressions
-
-A function expression is composed of a function identifier immediately followed by parenthesis `( )` containing zero or more argument expressions seperated by comma `,`. Each argument inside a function call is evaluated before the function expression. A function can be reduced to a literal if it has a return value. A function expression evaluates to the return value of the function it calls. If the function it calls has no return type, the function expresssion simply executes its code.
-
-```java
-print("hello world")
-add(10 + b)
-square(num)
-factorial(5)
-```
-
-### Array Access Expression
-
-An array access expression is composed of an array identifier immediately followed by parenthesis `( )` containing an integer literal or an expression reducable to an integer literal. The array access expression evaluates into the element of the array.
-
-```java
-myArray[4]
-myNums[i]
-myCollection[size - 1]
-myList[x] > myList[x+1]
+num as /* You can even comment in the middle of lines! */ int;
 ```
 
 ## Variables
 
-Variables in Porado are statically typed. To declare a variable, first write the `var` keyword followed by the variable identifier. Then write the `as` keyword followed by the variable data type. Variables can be instantiated at declaration, or later in the code by calling its identifier:
+Variables are used for containing data. In Porado, variables have explicit static typing, meaning you must clearly define the data type for each variable and it cannot change in runtime. Variable modifiers alter the normal behavior of variables. Multiple variable modifiers can be put into the same variable and combined in any order.
 
-```java
-var myVariable1 as int = 12345;
+Variables are declared using this general pattern:
 
-var myVariable2 as float;
-myVariable2 = 123.45;
+```js
+<variable-identifier> as <modifiers...> <data-type>;
 ```
 
-### Strict Variables
+A value can be assigned to a variable during declaration or later by referencing its identifier using the `=` assignment operator using this patterns:
 
-A variable can be declared as strict by adding the `strict` keyword before the data type. A strict variable does not have default values defined by its data type and will throw a runtime error when the program tries to access it withtout initializing it first.
+```js
+<variable-identifier> as <modifiers...> <data-type> = <value>;
 
-```java
-var myStrictString as strict string = "Hello!";
-var myOtherString as string = myStrictVar; // Runs with no errors
-
-var myStrictFloat as strict float;
-var myOtherFloat as float = myStrictVar; // Compile-time error
+<variable-identifier> = <value>;
 ```
 
-An uninitialized variable will use its default value when its identifier is called. More details at the **Data Types** section.
 
-### Fixed Variables
+### Data Types
 
-Variables can be set to immutable and read-only by adding the `fixed` keyword before its data type. A fixed variable will only keep the value it was instantiated with; you can declare a fixed variable without an initial value then assign it only once afterwards. If you try to assign a new value to a fixed variable, it will trigge a compile-time error.
-
-```java
-var PI as fixed float = 3.14159265359;
-PI = 3; // Compile-time error
-
-var goldenRatio as fixed float;
-goldenRatio = 1.61803398875;
-goldenRatio = 123; // Compile-time error
-```
-
-### Arrays
-
-An array can hold multiple variables of the same type. You can access a specific element of an array using its array index, which start at 0 to represent the first element. To declare an array, you add the `array` keyword after the data type. An array in Porado uses the square braces `[ ]` to declare its elements. You can't access elements outside the array's length:
-
-```java
-var myFloatArray as float array = [1.2, 3.4, 5.6];
-
-// Takes the element at index 0 and assigns it to myFloat.
-var myFloat as float = myFloatArray[0];
-
-// Assigns a new value to element at index 1
-myFloatArray[1] = 7.8;
-
-// Will throw an error.
-myFloatArray[100] = 100.0;
-```
-
-To declare an empty array without specifying its elements, you add the `of` keyword after the array keyword then specify the array size:
-
-```java
-// An array of 20 elements
-var myIntArray as int array of 20;
-```
-
-The elements of the array will use the default value of its data type when accessed before being assigned a value. More details at the **Data Types** section.
-
-### Multi-dimensional Arrays
-
-A multi-dimensional array in Porado is an array which its elements are also arrays, and they can be declared by adding more `array` keywords after the first `array` keyword:
-
-```java
-// Reads as "array of array of integers"
-var my2DArray as int array array = [
-    [1,2,3],
-    [4,5,6],
-    [7,8,9]
-];
-
-
-// You can nest even more arrays!
-var myMultiArray as int array array array = [
-    [
-        [1,2,3],
-        [4,5,6],
-        [7,8,9]
-    ],
-    [
-        [1,2,3],
-        [4,5,6],
-        [7,8,9]
-    ]
-]
-```
-
-To declare a multi-dimensional empty array, you add an `of` keyword and declare the size of each level of array. To access the elements of a multi-dimensional array, you use multiple square braces `[ ]`, wherein the leftmost is the topmost array, and the rightmost is the bottommost array holding the variable elements:
-
-```java
-// Can be read as "an array of 2 arrays of 3 elements"
-var myEmptyMultiArray as int array of 2 array of 3;
-
-// Assigns the first array's first element
-myEmptyMultiArray[0][0] = 1;
-
-// Assigns the second array's third element
-myEmptyMultiArray[1][2] = 1;
-```
-
-### Fixed Arrays
-
-An array can be declared as immutable and read-only by adding a `fixed` keyword before the data type while also adding the `array` keyword after the data type. A fixed array cannot be assigned a new list of values. The elements of a fixed array are also considered as fixed variables, so you cannot change the values of an element of a fixed array.
-
-```java
-var myFixedArray as fixed int array;
-myFixedArray = [1,2,3,4,5];
-
-myFixedArray = [6,7,8,9,0]; // Compile-time error
-```
-
-```java
-var myFixedArray as fixed int array;
-myFixedArray = [1,2,3,4,5];
-
-myFixedArray[0] = 100; // Compile-time error
-```
-
-## Data Types
-
-Porado has a couple basic data types that cover most use cases in programming. Available data types include `int`, `float`, `char`, `string`, and `boolean`. The default value of a data type is the value it takes when a variable of that data type gets used without being initialized. A [strict variable](#strict-variables) does not take a default value, instead it becomes null when initially declared and not assigned a value. Accessing a strict variable while it is null results in a runtime error.
+Porado has five basic data types that covers the majority of use cases in programming. Available data types include `int`, `float`, `char`, `string`, and `boolean`. A variable that is declared but not assigned a value uses its default value (determined by its data type) when its value is accessed during runtime.
 
 | Data Type | Description | Default Value |
 |:---------:|:------------|:-------------:|
@@ -288,35 +100,172 @@ Porado has a couple basic data types that cover most use cases in programming. A
 | string | UTF-8 encoded sequence of char values | "" |
 | boolean | Logical truth value (true or false) | false |
 
+```js
+num as int;
+name as string;
+key as char;
+price as float;
+isDay as boolean;
+```
+
+### Strict Variables
+
+A strict variable is a variable that doesn't use default values. When the value of a strict variable is accessed before it was assigned a value, a runtime error is occured.
+
+To declare a variable as a strict variable, add the `strict` modifier keyword in the variable declaration:
+
+```js
+num as strict int;
+
+print(num); // Runtime error
+```
+
+### Fixed Variables
+
+A fixed variable is immutable and can only be assigned a value only once. Attempting to assign a new value to a fixed variable after it was already assigned a value will make a runtime error occur.
+
+To declare a variable as a fixed variable, add the `fixed` modifier keyword in the variable declaration:
+
+```js
+num as fixed int;
+num = 10;
+num = 20; // Runtime error
+```
+
+## Arrays
+
+Arrays are used to store multiple values of the same type. In Porado, arrays are immutable, meaning you can't change the array length after its declaration. An array must have a specified length at declaration.
+
+Arrays are declared using this pattern:
+
+```js
+<array-identifier> as <modifiers...> <data-type> array of <array-length>;
+```
+
+```js
+nums as int array of 10;
+```
+
+Square braces `[ ]` are used to denote lists for arrays. Each element in the list must be of the same type, and are separated by comma `,`. If an array is declared and initialized with a list of elements, the length of the array can be infered and omitted from the declaration.
+
+```js
+nums as int array = [1,2,3,4,5];
+```
+
+An element of the array can be accessed using the array access operator `[ ]` which is appended to the left of an array identifier and contains an integer. It references a corresponding element where the integer is the index position of that element, allowing both read and write operations. An integer that is negative or greater than or equal to the array causes a runtime error. Indexes of array elements begin at 0.
+
+```js
+nums as int array = [2,4,6,8,10];
+
+
+nums[0] = 1; // Assign to 1
+num2 = nums[4] // num2 == 10
+num3 = nums[-1] // Runtime error
+num4 = nums[10] // Runtime error
+```
+
+### Multi-Dimensional Arrays
+
+Arrays can store any data, even other arrays. Storing arrays inside of arrays makes multi-dimensional arrays. All child arrays of a parent array must have the same length. Multi-dimensional arrays can be used to mimic tables with rows and columns.
+
+To declare a multi-dimensional array, replace the data type to an array type:
+
+```js
+// Parenthesis added for clarity
+
+nums as (int) array of 5; // Data type is int
+
+nums as (int array of 10) array of 5 // int -> int array
+```
+
+```js
+// nums is an array of 5 elements of integer arrays of 10 elements
+nums as int array of 10 array of 5
+
+// nums is an array of 2 elements of arrays of 3 elements of integer array with 4 elements
+nums as int array of 4 array of 3 array of 2;
+```
+
+You can initialize the multi-dimensional array with an existing list to omit verbose code:
+
+```js
+nums as int array array = [
+    [1,2,3],
+    [4,5,6],
+    [7,8,9]
+];
+```
+
+Values in multi-dimensional arrays can be accessed, read, and wrote to using chained array access operators `[ ]` to refernce the element. The leftmost access operator references the top array and the rightmost access operator references the element.
+
+```js
+nums as int array array = [
+    [1,2,3],
+    [4,5,6],
+    [7,8,9]
+];
+
+nums[0][0] = 10; // Assign to 10
+num1 = nums[0][1] // nums1 == 2
+num2 = nums[1][1] // nums5 == 5
+num3 = nums[3][1] // Runtime error
+```
+
+### Strict Arrays
+
+A strict array has elements that do not use the default values. When an element of a strict array is accessed before it was assigned a value, a runtime error is occured.
+
+To declare an array as a strict array, add the `strict` modifier keyword in the array declaration:
+
+```js
+nums as strict int array of 10;
+
+print(num[0]); // Runtime error
+```
+
+### Fixed Arrays
+
+A fixed array has elements that are immutable and can only be assigned a value exactly once. Attempting to assign a new value to an element of a fixed array after it was already assigned a value will make a runtime error occur.
+
+To declare an array as a fixed array, add the `fixed` modifier keyword in the array declaration:
+
+```js
+nums as fixed int array;
+nums[0] = 10;
+nums[0] = 20; // Runtime error
+```
+
 ## Operators
 
-Operators in Porado are used to compute data in a wide range of scenarious. There are many kinds of operators available in Porado, including `arithmetic`, `assignment`, `comparison`, and `logical` operators.
+Operators are used to perform different operations on numerical values. Operators in Porado fall into these categories: **arithmetic**, **assignment**, **comparison**, and **logical**.
 
 ### Arithmetic Operators
 
-Arithmetic operators performs computations between two numerical literals or expressions.
+Arithmetic operators perform computations between two numerical literals or expressions.
 
 | Operator | Name | Description | Format |
 |:--------:|:-----|:-----------:|:------:|
 | + | Addition | Adds two values | A + B |
 | - | Subtraction | Subtracts one value from the other | A - B |
-| * | Multiplication | Mutliples two values | A * B |
+| * | Multiplication | Mutliplies two values | A * B |
 | / | Division | Divides one value by the other | A / B |
 | % | Modulo | Returns the division remainder | A % B |
-| ++ | Increment | Unary operation, add 1 to value | A++ |
-| -- | Decrement | Unary operation, remove 1 from value | A-- |
 
-#### Negative Sign
+#### Unary Arithmetic Operators
 
-The negative sign is a special unary arithmetic operation that has the same symbo as Subtraction. It inverts the sign of the a numerical value.
+Some arithmetic operators only has one operand.
 
 | Operator | Name | Description | Format |
 |:--------:|:-----|:-----------:|:------:|
-| - | Negative Sign | Unary operation, inverts the sign of a value | -A |
+| ++ | Increment | Add 1 to value | ++A or A++ |
+| -- | Decrement | Remove 1 from value | --A or A-- |
+| - | Negative Symbol | Inverts the sign of the value | -A |
+
+**Note:** Increment and Decrement operators can be appended to either the left or right side of the operand. When on the left side, the pre-increment or pre-decrement operator performs its operation before the value is accessed. On the right side, the value is accessed first before the operand performs its operation. Increment and decremenet operators can only be used on variables, not literals or expressions.
 
 ### Assignment Operators
 
-Assignment operations are used to initialize variables with value.
+Assignment operations are used to assign variables with value.
 
 | Operator | Name | Description | Format |
 |:--------:|:-----|:-----------:|:------:|
@@ -329,7 +278,7 @@ Assignment operations are used to initialize variables with value.
 
 ### Comparison Operators
 
-Comparison operators compares two numerical values and evaluates either `true` or `false`.
+Comparison operators compare two numerical values and evaluates either `true` or `false`.
 
 | Operator | Name | Description | Format |
 |:--------:|:-----|:-----------:|:------:|
@@ -342,7 +291,7 @@ Comparison operators compares two numerical values and evaluates either `true` o
 
 ### Logical Operators
 
-Logical operators compares two boolean values and evaluates either Comparison operators compares two numerical values and evaluates either `true` or `false`.
+Logical operators compare boolean values and evaluate to true or false.
 
 | Operator | Name | Description | Format |
 |:--------:|:-----|:-----------:|:------:|
@@ -354,463 +303,435 @@ Logical operators compares two boolean values and evaluates either Comparison op
 | xor | Logical XOR | Returns `true` only if values are different; otherwise returns `false` | A xor B |
 | xnor | Logical XNOR | Returns `true` only if values are the same; otherwise returns `false` | A xnor B |
 
+### Order of Precedence
+
+When an expression contains two or more operations, certain operators are evaluated first before the others. Porado has an order of precedence for operators to determine which gets evaluated first to ensure the result is correct and accurate.
+
+| Precedence | Operation | Note |
+|:----------:|:---------:|:-----:|
+| 1 | `( )` | Expression inside the parenthesis is evaluated first |
+| 2 | `++`, `--`, `-` | This is the negative symbol, not subtraction |
+| 3 | `*`, `/`, `%` | - |
+| 4 | `+`, `-` | - |
+| 5 | `>`, `<`, `>=`, `<=` | - |
+| 6 | `==`, `!=` | - |
+| 7 | `not` | - |
+| 8 | `and`, `nand` | - |
+| 9 | `or`, `nor` | - |
+| 10 | `xor`, `xnor` | - |
+| 11 | `=` | - |
 
 ## Conditionals
 
-Conditional statements in Porado include `if`, `else`, and `switch` statements that help guide control flow when the code runs.
+A condition is an expression that produces a boolean value (true or false) after evaluation. It can be a combination of different groupings, values, operators, and expressions.
 
-### If statements
-
-In Porado, an `if` statement evaluates a condition to decide whether to run a piece of code or not. An `if` statement must be followed by the condition wrapped in parenthesis `( )` followed by a `then` keyword.
-
-```java
-var isTrue as boolean = true;
-var myVar as string;
-
-if (isTrue) then myVar = "It is true!";
+```js
+x == 10
+a > 0 and a <= 100
+(num + 10) * 5 > 100
+(x > 3) and (y <= 10) and (z == 5)
 ```
 
-To run multiple lines of code using an `if` statement, define a **code block** by surroudning multiple lines of code with curly brackets `{ }`.
+### If
 
-```java
-var isTrue as boolean = true;
-var myVarArray as string array of 3;
+`If` statements can be used to execute some code if a condition is `true`.
 
-if (isTrue) then {
-    myVarArray[0] = "It";
-    myVarArray[1] = "is";
-    myVarArray[2] = "true!";
+An `if` statement can be declared using this format:
+
+```js
+if (<condition>) then {
+    // Code if condition is true...
 }
 ```
 
-### Else statements
+If the code for an `if` statement is only one line, the curly praces `{ }` may be omitted.
 
-If the condition in an `if` statement evaluates into `false`, the code defined in the `else` statement runs instead. An `else` statement must come only after an `if` statement:
-
-```java
-var isTrue as boolean = false;
-var myVar as string;
-
-if (isTrue) then myVar = "It is true!"; else myVar = "It is false!";
+```js
+if (<condition>) then /* Code if condition is true*/;
 ```
 
+### Else
 
-```java
-var isTrue as boolean = false;
-var myVarArray as string array of 3;
+An `else` statement executes some code if the `if` statement condition is `false`.
 
-if (isTrue) then {
-    myVarArray[0] = "It";
-    myVarArray[1] = "is";
-    myVarArray[2] = "true!";
+An `else` statement can be declared using this format:
+
+```js
+if (<condition>) then {
+    // Code if condition is true...
 } else {
-    myVarArray[0] = "It";
-    myVarArray[1] = "is";
-    myVarArray[2] = "false!";
+    // Code if condition is false...
 }
 ```
 
-### Else If statements
+```js
+if (<condition>) then /* Code if condition is true*/; else /* Code if condition is false*/;
 
-When the condition to an `if` statement evaluates to `false`, you can check for another condition using an `else if` statement. The `then` keyword is also used after the condition in an `else if` statement. An `else if` statement can only be placed after an `if` statement:
+if (<condition>) then /* Code if condition is true*/;
+else /* Code if condition is false*/;
+```
 
-```java
-var myBool1 as boolean = false;
-var myBool2 as boolean = true;
-var myName as string;
+### Else If
 
-if (myBool1) then {
-    myName = "John"; // This code won't run
-} else if (myBool2) then {
-    myName = "Doe"; // This code will run
+An `else-if` statement executes some code if the previous `if` or `else-if` statement conditions are `false` and its condition is `true`. 
+
+An `else-if` statement can be declared using this format:
+
+```js
+if (<condition>) then {
+    // Code if condition1 is true...
+} else if (<condition>) then {
+    // Code if condition2 is true...
 }
 ```
 
-You can combine `if`, `else`, and `else if` statements, but within a single chain, there can only be one initial `if` statement, followed by zero or more `else if` statements, and an optional `else` statement:
+Multiple `else-if` statements can be chained together.
 
-```java
-var myDayInt as int = 4;
-var myDayString as string;
+```js
+if (<condition>) then {
+    // Code if condition1 is true...
+} else if (<condition>) then {
+    // Code if condition2 is true...
+} else if (<condition>) then {
+    // Code if condition3 is true...
+} else if (<condition>) then {
+    // Code if condition4 is true...
+} else if (<condition>) then {
+    // Code if condition5 is true...
+} else if (<condition>) then {
+    // Code if condition6 is true...
+...
+```
 
-if (myDayInt == 1) then {
-    myDayString = "Monday";
-} else if (myDayInt == 2) then {
-    myDayString = "Tuesday";
-} else if (myDayInt == 3) then {
-    myDayString = "Wednesday";
-} else if (myDayInt == 4) then {
-    myDayString = "Thursday";
-} else if (myDayInt == 5) then {
-    myDayString = "Friday";
-} else if (myDayInt == 6) then {
-    myDayString = "Saturday";
-} else if (myDayInt == 7) then {
-    myDayString = "Sunday";
+An `else` statement can be put after the last `else-if` statement and runs its code if the `if` and all `else-if` statement conditions are false.
+
+```js
+if (<condition>) then {
+    // Code if condition1 is true...
+} else if (<condition>) then {
+    // Code if condition2 is true...
 } else {
-    myDayString = "Unknown Day";
+    // Code if condition1 and condition2 are false...
+}
+```
+Conditions are evaluated one after the other, so even one of the next conditions are `true`, their code won't be executed if an earlier condition also evaluates to `true`.
+
+```js
+age as int = 18;
+
+if (age < 13) then {
+    print("Child");
+} else if (age < 20) then {
+    print("Teen");
+} else {
+    print("Adult");
+}
+
+```
+
+## Switch
+
+When there are too many possible decisions to make, creating a chain of `else-if` statements can get cumbersome and suboptimal. A `switch` statement solves this by declaring multiple `case` statements inside of its body. A `switch` statement takes an expression as input, and chooses only one `case` statement to execute. The `switch` compares the value of its expression against each case target using value equality (==). The first matching case is executed.
+
+A `switch` statement can be declared using this format:
+
+```js
+switch (<expression>) {
+
+    case(<target>): {
+        // Code if target1 is equal to the expression...
+    }
+
+    case(<target>): {
+        // Code if target2 is equal to the expression...
+    }
+
+    case(<target>): {
+        // Code if target3 is equal to the expression...
+    }
+
 }
 ```
 
-You can omit redundant code blocks if there is only one line of code in each statement. This can greatly improve readability:
+A special `case` statement called a `default` statement does not have a target value, but is only run when all other `case` statements did not match the expression.
 
-```java
-if (myDayInt == 1) then myDayString = "Monday";
-else if (myDayInt == 2) then myDayString = "Tuesday";
-else if (myDayInt == 3) then myDayString = "Wednesday";
-else if (myDayInt == 4) then myDayString = "Thursday";
-else if (myDayInt == 5) then myDayString = "Friday";
-else if (myDayInt == 6) then myDayString = "Saturday";
-else if (myDayInt == 7) then myDayString = "Sunday";
-else myDayString = "Unknown Day";
-```
+```js
+switch (<expression>) {
 
-### Switch statements
-
-Long chains of `if`, `else`, and `else if` statements can be cumbersome, so the alternative is to use `switch` statements. To declare a `switch` statement, you need to write a condition surrounded by parenthesis `( )` followed by a `to` keyword. Naturally, you use a **code block** to define multiple `case` statements, declared as `case` followed by parenthesis `( )` with a target value inside.
-
-`Switch` statements in Porado do not fall through; a `switch` statement selects only one branch of code to execute based on a `case` statement with a matching target value. `Case` statements cannot have duplicate target values.
-
-An optional `default` statement, which is a special `case` statement, can be added to the `switch` statement. If no `case` statements are picked by the `switch` statement, the `default` statement is chosen if it exists. There can only be one `default` statement inside a single `switch` statement:
-
-```java
-var myDayInt as int = 4;
-var myDayString as string;
-
-switch (myDayInt) to {
-    case(1) myDayString = "Monday";
-    case(2) myDayString = "Tuesday";
-    case(3) myDayString = "Wednesday";
-    case(4) myDayString = "Thursday"; // Runs this code only
-    case(5) myDayString = "Friday";
-    case(6) myDayString = "Saturday";
-    case(7) myDayString = "Sunday";
-    default myDayString = "Unknown Day";
-} 
-```
-
-```java
-var myDayInt as int = 100;
-var myDayString as string;
-
-switch (myDayInt) to {
-    case(1) yDayString = "Monday";
-    case(2) yDayString = "Tuesday";
-    case(3) yDayString = "Wednesday";
-    case(4) yDayString = "Thursday";
-    case(5) yDayString = "Friday";
-    case(6) yDayString = "Saturday";
-    case(7) yDayString = "Sunday";
-    default myDayString = "Unknown Day"; // Runs this code only
-} 
-```
-
-```java
-var myDayInt as int = 100;
-var myDayString as string;
-
-switch (myDayInt) to {
-    case(1) yDayString = "Monday";
-    case(1) yDayString = "Monday"; // Compile-time error
-    case(2) yDayString = "Tuesday";
-    case(3) yDayString = "Wednesday";
-    case(4) yDayString = "Thursday";
-    case(5) yDayString = "Friday";
-    case(6) yDayString = "Saturday";
-    case(7) yDayString = "Sunday";
-    default myDayString = "Unknown Day";
-} 
-```
-
-`Case` statements also allow multiple lines of code to run through the use of **code blocks**, similar to `if`, `else`, and `else if` statements:
-
-```java
-var myAnimatCategory as string = "mammals";
-var myAnimalNames as string array of 3;
-
-switch (myAnimatCategory) to {
-    case("amphibians") {
-        myAnimalNames[0] = "frog";
-        myAnimalNames[1] = "turtle";
-        myAnimalNames[2] = "axolotl";
+    case(<target>): {
+        // Code if target1 is equal to the expression...
     }
 
-    case("reptiles") {
-        myAnimalNames[0] = "crocodile";
-        myAnimalNames[1] = "lizard";
-        myAnimalNames[2] = "snake";
+    case(<target>): {
+        // Code if target2 is equal to the expression...
     }
 
-    case("mammals") {
-        myAnimalNames[0] = "human";
-        myAnimalNames[1] = "dog";
-        myAnimalNames[2] = "horse";
+    default: {
+        // Code if neither target1 or target2 is equal to the expression...
     }
+
+}
+```
+
+If the case statement code only includes one line, the curly braces may be omitted.
+
+```js
+switch (<expression>) {
+
+    case(<target>): /* Code if target1 is equal to the expression...*/;
+    case(<target>): /* Code if target2 is equal to the expression...*/;
+    case(<target>): /* Code if target3 is equal to the expression...*/;
+    case(<target>): /* Code if target4 is equal to the expression...*/;
+
+    default: /* Code if no case statements are executed... */;
+
+}
+```
+
+```js
+grade as char = 'B';
+
+switch (grade) {
+
+    case('A'): {
+        print("Excellent!");
+    }
+
+    case('B'): {
+        print("Good job!");
+    }
+
+    case('C'): {
+        print("You passed.");
+    }
+
+    default: {
+        print("Invalid grade.");
+    }
+
 }
 ```
 
 ## Loops
 
-Loop statements in Porado help control flow by allowing iteration of the same code, making code more compact and dynamic. Loops in Porado include `while`, `do-while`, `until`, `do-until`, `for`, and `repeat` loops.
+Loops are used to iterate over some code. Loops in Porado include `while`, `do-while`, `until`, `do-until`, `for`, and `repeat` loops.
 
-### While & Do-While loops
+### While
 
-`While` and `do-while` loops iterate through a piece of code or **code block** while a condition remains `true`. A `while` loop first checks if the condition is `true` before executing its code; if it is `true` then it runs, otherwise it stops exit the `while` loop, potentially skipping its code. On the other hand, a `do-while` loop first executes its code then it checks its condition if it is true or not, allowing at least one iteration of its code to run.
+A `while` loop iterates over a code as long as its condition is `true`. In each iteration, the `while` loop first checks its condition. If the condition is `true`, the code is executed and the next iteration begins; otherwise the `while` loop is exited.
 
-To declare a `while` loop, it has to be followed by a conditional enclosed in parenthesis `( )` and a `then` keyword. A `while` loop can run both a single piece of code or a **code block** for multiple lines of code:
+A `while` loop can be declared using the format:
 
-```java
-var myCounter as int = 0;
-
-while (myCounter < 100) then myCounter = myCounter + 1;
+```js
+while (<condition>) then {
+    // Code is executed while condition is true...
+}
 ```
 
-```java
-var myCounter as int = 0;
-var mySum as int = 0;
+### Do While
 
-while (myCounter < 5) then {
-    mySum = mySum + myCounter;
-    myCounter = myCounter + 1;
-};
-```
+A `do-while` loop iterates over a code as long as its condition is `true`. In each iteration, the `do-while` loop executes its code first, then checks its condition. If the condition is `true`, the next iteration begins; otherwise the `do-while` loop is exited. This allows the `do-while` loop to run at least once.
 
-Similarly, to declare a `do-while` loop, first write the `do` keyword followed by a line of code or a **code block**. After that, write the `then` keyword and the `while` keyword with a conditional enclosed in parenthesis `( )`:
+A `do-while` loop can be declared using the format:
 
-```java
-var myCounter as int = 0;
-
-do myCounter = myCounter + 1 then while (myCounter < 100);
-```
-
-```java
-var myCounter as int = 0;
-var mySum as int = 0;
-
+```js
 do {
-    mySum = mySum + myCounter;
-    myCounter = myCounter + 1;
-} then while (myCounter < 5);
+    // Code is executed while condition is true...
+} while (<condition>);
 ```
 
-### Until & Do-Until loops
+### Until
 
-`Until` and `do-until` loops are exactly like `while` and `do-while` loops, except they only iterate through a piece of code or a **code block** until their condition becomes `true`. In other words, they only iterate through their code if the condition is `false`.
+The `until` loop is the inverse of a `while` loop.
 
-The declaration of an `until` loop is syntactically the same as a `while` loop, except replace the `while` with an `until` keyword:
+An `until` loop iterates over a code as long as its condition is `false`. In each iteration, the `until` loop first checks its condition. If the condition is `false`, the code is executed and the next iteration begins; otherwise the `until` loop is exited.
 
-```java
-var myCounter as int = 0;
+An `until` loop can be declared using the format:
 
-until (myCounter == 100) then myCounter = myCounter + 1;
+```js
+until (<condition>) then {
+    // Code is executed until condition is true...
+}
 ```
 
-```java
-var myCounter as int = 0;
-var mySum as int = 0;
+### Do Until
 
-until (myCounter == 5) then {
-    mySum = mySum + myCounter;
-    myCounter = myCounter + 1;
-};
-```
+A `do-until` loop iterates over a code as long as its condition is `false`. In each iteration, the `do-until` loop executes its code first, then checks its condition. If the condition is `false`, the next iteration begins; otherwise the `do-until` loop is exited. This allows the `do-until` loop to run at least once.
 
-Likewise, a `do-until` loop also shares the same syntax as a `do-while` loop, only replacing the `while` keyword with an `until` keyword:
+A `do-until` loop can be declared using the format:
 
-```java
-var myCounter as int = 0;
-
-do myCounter = myCounter + 1 then until (myCounter == 100);
-```
-
-```java
-var myCounter as int = 0;
-var mySum as int = 0;
-
+```js
 do {
-    mySum = mySum + myCounter;
-    myCounter = myCounter + 1;
-} then until (myCounter == 5);
+    // Code is executed until condition is true...
+} until (<condition>);
 ```
 
-### For loops
+### For
 
-A `for` loop in Porado iterates through each element in a given list of elements, such as an array. To declare a `for` loop, first write the `for` keyword followed by the `each` keyword, and then parenthesis `( )` surrounding the **iteration variable**, the `in` keyword, and the **iteration list**. Lastly, write the piece of code or **code block** to execute.
+A `for` loop iterates over every element in an array. An iteration variable is used to access an element from the array, and it changes to the next after each iteration.
 
-A `for` loop iterates its code a number of times equal to the length of the **iteration list**. Each element in the **iteration list** will be iterated through by the `for` loop by changing the **iteration variable** to the next every end of each iteration:
+A `for` loop can be declared using the format:
 
-```java
-var mySum as int = 0;
-
-for each (number in [1,2,3,4,5]) mySum = mySum + number;
+```js
+for (each <iteration-variable> in <iteration-array>) {
+    // Code is executed for every element in the array...
+}
 ```
+The iteration variable is a direct reference instead of a copy of the element in an array, allowing it to be used to mutate the data inside the `for` loop.
 
-A `for` loop can be used to modify an array. In Porado, a `for` loop binds the **iteration variable** as reference to each element from the **iteration list**. Assigning to the **iteration variable** will directly modify the list contents. Be careful on using this on fixed arrays, as its elements are also fixed and mutating it can cause errors:
+```js
+nums as int array of 30;
 
-```java
-var myEmptyArray as int array of 30;
-var myCounter as int = 0;
+// Write
+for (each num in nums) {
+    num = 10;
+}
 
-for each (element in myEmptyArray) {
-    element = myCounter;
-    myCounter = myCounter + 1;
+// Read
+for (each num in nums) {
+    print(num);
 }
 ```
 
-```java
-var myEmptyArray as int fixed array = [1,2,3,4,5];
-var myCounter as int = 0;
+### Repeat
 
-for each (element in myEmptyArray) {
-    element = myCounter; // Compile-time error
-    myCounter = myCounter + 1;
+A `repeat` loop iterates some code a specified number of times. The specified value must be an integer.
+
+A `repeat` loop can be written using the format:
+
+```js
+repeat (<integer>) {
+    // Code is iterated a number of times equal to the integer...
 }
 ```
 
-Nested `for` loops can also be used to conveniently access multi-dimensional arrays:
+An iteration variable can optionally be added to keep track of iterations. To include an iteration variable, use the `with` keyword followed by the variable declaration. The iteration variable must be of type `int`.
 
-```java
-var myEmptyArray as int array of 10 array of 10;
-var myCounter as int = 0;
+A starting point can be defined by initializing the iteration variable to a number, or not initializing to use the default value of 0.
 
-for each (subarray in myEmptyArray) {
-    for each (elements in subarray) {
-        elements = myCounter;
-        myCounter = myCounter + 1;
-    }
+```js
+repeat (<integer>) with <variable-declaration> {
+    // Code is iterated a number of times equal to the integer...
 }
 ```
 
-```java
-var myEmptyArray as int array array array = [
-    [
-        [1,2,3],
-        [4,5,6],
-        [7,8,9]
-    ],
-    [
-        [1,2,3],
-        [4,5,6],
-        [7,8,9]
-    ],
-    [
-        [1,2,3],
-        [4,5,6],
-        [7,8,9]
-    ]
-];
-
-var myTotal as int = 0;
-
-for each (subarray1 in myEmptyArray) {
-    for each (subarray2 in subarray1) {
-        for each (number in subarray2) {
-            myTotal = myTotal + number;
-        }
-    }
+```js
+repeat (5) with i as int {
+    print(i); // 0, 1, 2, 3, 4
 }
 ```
 
-### Repeat loop
-
-A `repeat` loop in Porado is a simple loop that iterates its code a specified number of times. To declare a `repeat` loop, first write the `repeat` keyword followed by an `int` value enclosed in parenthesis `( )`. Lastly, write the piece of code or a **code block** to execute:
-
-```java
-var myCounter as int = 0;
-
-repeat (10) {
-    myCounter = myCounter + 1;
-}
-```
-
-You can also include an **iteration variable** in the repeat loop to use in cases where distinquishing the current iteration is important. You can do so by adding an `int` variable declaration with the  repeat amount `int` value both enclosed in the parenthesis `( )` but separated by comma `,`. The **iteration variable** will be declared locally within the `repeat` loop, and it will be incremented by 1 automatically at each end of iteration.
-
-```java
-var myArraySize as int = 30
-var myArray as int array of myArraySize;
-
-repeat (var i as int = 0, myArraySize) {
-    myArray[i] = i;
+```js
+repeat (5) with i as int = 3 {
+    print(i); // 3, 4, 5, 6, 7
 }
 ```
 
 ### Break & Continue
 
-The `break` and `continue` keywords in Porado creates more advanced control flow by altering the behavior of most loops, such as skipping over certain iterations or just ending the loop early.
+The `break` and `continue` keywords can be used to control the flow of loops in code.
 
-The `break` keyword tells the loop to stop and exit immediately, skipping all incoming iterations, if any. On the other hand, the `continue` keyword, immediately ends the current iteration and jump to the next one, skipping over any left-over code in the **code block**:
+#### Break
 
-```java
-var myVar as int = 0;
+The `break` keyword exits the loop immediately.
+
+```js
+num as int = 0;
 
 while (true) then {
-    myVar = myVar + 1;
-    if (myVar > 100) then break;
+    if (num > 100) {
+        break; // Exits while loop if num > 100...
+    }
+
+    num++;
 }
 ```
 
-```java
-var myNumArray as int array = [2,4,6,5,8,10,12];
+#### Continue
 
-for each (number in myNumArray) {
-    if (number % 2 == 0) then continue else break;
-}
-```
+The `continue` keyword skips to the next iteration immediately.
 
-```java
-var mySum as int = 0;
+```js
+nums as int = [1,2,3,4,5,6,7,8,9,10];
 
-repeat (var i as int = 0; 100) {
-    if (i % 2 == 0) then continue;
-    mySum = mySum + i;
+for (each num in nums) {
+    if (num % 2 == 0) {
+        continue; // Skips every even number...
+    }
+
+    print(num);
 }
 ```
 
 ## Functions
 
-Functions can help encapsulate logic into manageable and reusable pieces and help give clarity to large codebases. In Porado, to make an function you must use the `func` keyword at the beginning and then provide the function identifier. Afterwards, write the `accepts` keyword followed by parenthesis `( )` which may contain none or more variable or array declarations. These variables are the **input parameters** of the function. Next, write the `returns` keyword followed by the **return type**. The **input parameters** are all local to the function. If a function does not have any **input parameters** or **return type**, you may omit the `accepts` or `returns` keywords respectively. The function body, usually a **code block**, determines what code executes when the function is called.
+A function is a named block of code that performs a specific task. It can accept input values (parameters) and optionally produce an output value (return type). Functions are only executed when explicitly called. A function can be declared with parameters to accept input arguments when it is called. Function parameter variables are declared locally inside the function scope.
 
-To call a function, use its identifier followed by parenthesis `( )` sticking to the identifier. If the function has any **input parameters**, make sure to include the same number of arguments within the parenthesis `( )`, and each argument are of matching type to its parameter:
+A function with a `return` type evaluates into a value of that type when it is called. The `return` keyword followed by a value is used to exit the function and determines what value the function call evaluates to. A function declared with a `return` type must ensure that all possible control flow paths end with a `return` statement that provides a value of the declared type. A function with no return type can be ended early by using the `return` keyword by itself.
 
-The function call ends when it finishes executing all code within the function body, or when it encounters a `return` keyword. For functions with a **return type**, a `return` keyword followed by a value or variable that has the same data type as the **return type** is mandatory for all control flow end paths of the function.
+Functions can be called by using its identifier followed by parenthesis `( )` that includes zero or more arguments separated by comma. The amount of arguments must match the amount of parameters, and each argument must match the data type of its corresponding parameter.
 
-```java
-func adder accepts (var a as int, var b as int) returns int {
-    return a + b;
+A function can be declared using the format:
+
+```js
+<function-identifier> as function accepts (<input-parameters...>) returns <return-type> {
+    // Code runs when function is called...
+}
+```
+```js
+add as function accepts (num1 as int, num2 as int) returns int {
+    return num1 + num2;
 }
 
-
-var myVar1 as int = 10;
-var myVar2 as int = 25;
-var mySum as int = adder(myVar1, myVar2); // mySum == 35
+num as int = add(10, 20); // num == 30
 ```
 
-### Passing by reference
+A function with no parameters or return type can ommit the `accepts` and `returns` part of the declaration. A function does not return any value if it has no return keyword. Trying to access a value of a function with no return type will occur a runtime error.
 
-Functions in Porado, by default, pass its **input parameters** by value. This means that the parameters are copies of the arguments and modifying them inside the function won't affect the external variable. To allow for a function to have **input parameters** passed by reference, you can append a `reference` keyword after the data type in the parameter declaration. Passing in a literal or such as a reference will result in a runtime error:
 
-```java
-func square accepts (var num as int reference) {
-    num = num * num;
+```js
+num as int;
+
+setNum as function accepts (num1 as int) {
+    num = num1;
 }
 
+setNum(123); // num == 123
+```
 
-var myVar as int = 7;
-square(myVar); // myVar == 49
+```js
+num as int = 123;
 
-square(10); // Runtime error
+getNum as function returns int {
+    return num;
+}
+
+newNum as int = getNum(); // newNum === 123
+```
+
+```js
+hello as function {
+    print("Hello World!");
+}
+
+hello(); // Hello World!
+
+
+num as int = hello(); // Runtime error...
 ```
 
 ### Recursion
 
-Porado allows function recursion, which is when a function calls itself as a way to solve specific problems:
+Recursion occurs when a function calls itself directly or indirectly. It is often used for problems that can be broken down into smaller, similar subproblems.
 
-```java
-func factorial accepts (var num as int) returns int {
-    if (num == 1) then return 1;
+```js
+factorial as function accepts (num as int) returns int {
+    if (num == 1) {
+        return 1;
+    }
 
     return num * factorial(num - 1);
 }
 
-var myNum as int = 5;
-var myFact as int = factorial(myNum); // myFact = 120
+num as int = factorial(5); // num == 120
 ```
