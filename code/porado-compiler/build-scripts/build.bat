@@ -17,5 +17,3 @@ jpackage ^
   --win-console
 
 rar a -r "porado.rar" "porado"
-
-pause
