@@ -1,5 +1,5 @@
+cd ..
 rmdir /s /q "compiler-builds/porado"
-
 jpackage ^
   --input ./target/ ^
   --dest ./compiler-builds/ ^
