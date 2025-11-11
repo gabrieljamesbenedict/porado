@@ -41,3 +41,7 @@ out/
 .vscode/
 .code-workspace/
 
+##############################
+## Others
+##############################
+compiler-builds/
