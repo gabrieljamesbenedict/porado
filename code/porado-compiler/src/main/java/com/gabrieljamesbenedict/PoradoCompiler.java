@@ -1,9 +1,9 @@
 package com.gabrieljamesbenedict;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import com.gabrieljamesbenedict.LexicalAnalysis.LexicalAnalyzer;
+import com.gabrieljamesbenedict.LexicalAnalysis.Token;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -40,15 +40,16 @@ public class PoradoCompiler
         for (File file : files) {
             try {
                 reader = new BufferedReader(new FileReader(file));
-                String code = reader.lines().reduce(
-                        (a, b) ->
-                            a + " " + b
-                ).orElse("Error: Code reading error");
+                LexicalAnalyzer lexer = new LexicalAnalyzer(reader);
 
-
-
+                for (Token token : lexer.tokenize().toList()) {
+                    System.out.println(token.toString());
+                }
             } catch (FileNotFoundException e) {
                 System.out.println("Error: Cannot find file \"" + file.getName() + "\"");
+                return;
+            } catch (IOException e) {
+                System.out.println("Error: Something went wrong while reading the file \"" + file.getName() + "\"");
                 return;
             }
         }
