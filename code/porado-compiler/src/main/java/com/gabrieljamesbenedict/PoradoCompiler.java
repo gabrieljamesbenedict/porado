@@ -24,12 +24,11 @@ public class PoradoCompiler
                 System.out.println("Error: Unknown command \"" + command + "\"");
             }
         }
-
     }
 
     private static void compile(String[] args) {
         ArrayList<File> files = new ArrayList<>();
-        BufferedReader reader;
+        PushbackReader reader;
 
         for (int i = 0; i < args.length; i++) {
             if (i < 1) continue;
@@ -39,7 +38,7 @@ public class PoradoCompiler
 
         for (File file : files) {
             try {
-                reader = new BufferedReader(new FileReader(file));
+                reader = new PushbackReader (new FileReader(file));
                 LexicalAnalyzer lexer = new LexicalAnalyzer(reader);
 
                 for (Token token : lexer.tokenize().toList()) {
