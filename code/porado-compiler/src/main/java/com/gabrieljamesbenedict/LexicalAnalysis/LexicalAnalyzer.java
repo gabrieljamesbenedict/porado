@@ -245,9 +245,8 @@ public class LexicalAnalyzer {
         // Clean Token Stream
 
         TokenPostProcesser postProcesser = new TokenPostProcesser();
-        Stream<Token> tokenStream = postProcesser.clean(tokenArrayList.stream());
 
-        return tokenStream;
+        return postProcesser.clean(tokenArrayList.stream());
     }
 
     private static void addToken(String lexeme, Map<String, TokenType> lookup, TokenCategory category, List<Token> list) {
