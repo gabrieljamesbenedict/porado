@@ -32,9 +32,6 @@ public enum TokenType {
     KEYWORD_RETURN,
     KEYWORD_PRINT,
 
-    KEYWORD_TRUE,
-    KEYWORD_FALSE,
-
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_CHAR,
@@ -81,8 +78,14 @@ public enum TokenType {
     DELIMITER_COMMA,
     DELIMITER_SEMICOLON,
 
+    LITERAL_INT,
+    LITERAL_FLOAT,
+    LITERAL_CHAR,
+    LITERAL_STRING,
+    LITERAL_TRUE,
+    LITERAL_FALSE,
+
     IDENTIFIER,
-    LITERAL,
     NEWLINE,
     EOF
 

@@ -18,8 +18,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class LexicalAnalyzer {
 
-    private final PushbackReader codeReader;
-
     private static final Map<String, TokenType> KEYWORDS = Map.<String, TokenType>ofEntries(
             // Keywords
             entry("as", TokenType.KEYWORD_AS),
@@ -48,8 +46,6 @@ public class LexicalAnalyzer {
             entry("returns", TokenType.KEYWORD_RETURNS),
             entry("return", TokenType.KEYWORD_RETURN),
             entry("print", TokenType.KEYWORD_PRINT),
-            entry("true", TokenType.KEYWORD_TRUE),
-            entry("false", TokenType.KEYWORD_FALSE),
 
             // Data Types
             entry("int", TokenType.TYPE_INT),
@@ -102,14 +98,12 @@ public class LexicalAnalyzer {
         '+','-','*','/','%'
     );
 
-    public Stream<Token> tokenize() throws IOException {
+    public Stream<Token> tokenize(PushbackReader codeReader) throws IOException {
 
         StringBuilder symbol = new StringBuilder();
         ArrayList<Token> tokenArrayList = new ArrayList<>();
 
-        final String literalRegex = "true|false|[0-9]+|[0-9]+\\.[0-9]+|^\"(.)*\"$|^\'(.)*\'$";
-        Pattern pattern = Pattern.compile(literalRegex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher;
+
 
         while (codeReader.ready()) {
             char c = (char) codeReader.read();
@@ -175,9 +169,9 @@ public class LexicalAnalyzer {
                         tokenArrayList.add(new Token("neg", TokenType.OPERATOR_NEGATIVE));
                         current = current.substring(1);
                     }
-                    matcher = pattern.matcher(current);
-                    if (matcher.matches()) {
-                        addToken(current, TokenType.LITERAL, tokenArrayList);
+                    TokenType literalType = checkIfLiteral(current);
+                    if (literalType != null) {
+                        addToken(current, literalType, tokenArrayList);
                     } else {
                         addToken(current, KEYWORDS, tokenArrayList);
                     }
@@ -247,7 +241,12 @@ public class LexicalAnalyzer {
                 .build();
         tokenArrayList.add(eof);
 
-        return tokenArrayList.stream();
+        // Clean Token Stream
+
+        TokenPostProcesser postProcesser = new TokenPostProcesser();
+        Stream<Token> tokenStream = postProcesser.clean(tokenArrayList.stream());
+
+        return tokenStream;
     }
 
     private static void addToken(String lexeme, Map<String, TokenType> lookup, List<Token> list) {
@@ -256,6 +255,38 @@ public class LexicalAnalyzer {
     }
     private static void addToken(String lexeme, TokenType type, List<Token> list) {
         list.add(new Token(lexeme, type));
+    }
+
+    private TokenType checkIfLiteral (String compare) {
+        final String literalInt = "[0-9]+";
+        final String literalFloat = "[0-9]+\\.[0-9]+";
+        final String literalChar = "^\'(.)*\'$";
+        final String literalString = "^\"(.)*\"$";
+        final String literalTrue = "true";
+        final String literalFalse = "false";
+        final String[] literalRegexArray = {
+                literalInt, literalFloat, literalChar, literalString, literalTrue, literalFalse
+        };
+
+        int type = -1;
+        for (int i = 0; i < 5; i++) {
+            Pattern pattern = Pattern.compile(literalRegexArray[i], Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(compare);
+            if (matcher.matches()) {
+                type = i;
+                break;
+            }
+        }
+
+        return switch (type) {
+            case 0 -> TokenType.LITERAL_INT;
+            case 1 -> TokenType.LITERAL_FLOAT;
+            case 2 -> TokenType.LITERAL_CHAR;
+            case 3 -> TokenType.LITERAL_STRING;
+            case 4 -> TokenType.LITERAL_TRUE;
+            case 5 -> TokenType.LITERAL_FALSE;
+            default -> null;
+        };
     }
 }
 

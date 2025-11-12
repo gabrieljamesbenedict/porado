@@ -39,9 +39,9 @@ public class PoradoCompiler
         for (File file : files) {
             try {
                 reader = new PushbackReader (new FileReader(file));
-                LexicalAnalyzer lexer = new LexicalAnalyzer(reader);
+                LexicalAnalyzer lexer = new LexicalAnalyzer();
 
-                for (Token token : lexer.tokenize().toList()) {
+                for (Token token : lexer.tokenize(reader).toList()) {
                     System.out.println(token.toString());
                 }
             } catch (FileNotFoundException e) {
