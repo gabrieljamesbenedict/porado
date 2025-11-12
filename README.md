@@ -10,8 +10,7 @@
     - [Fixed Variables](#fixed-variables)
   - [Arrays](#arrays)
     - [Multi-Dimensional Arrays](#multi-dimensional-arrays)
-    - [Strict Arrays](#strict-arrays)
-    - [Fixed Arrays](#fixed-arrays)
+    - [Array and Array Element Modifiers](#array-and-array-element-modifiers)
   - [Operators](#operators)
     - [Arithmetic Operators](#arithmetic-operators)
       - [Unary Arithmetic Operators](#unary-arithmetic-operators)
@@ -139,23 +138,23 @@ Arrays are used to store multiple values of the same type. In Porado, arrays are
 Arrays are declared using this pattern:
 
 ```js
-<array-identifier> as <modifiers...> <data-type> array of <array-length>;
+<array-identifier> as <modifiers...> array of <array-length> <element-modifiers...> <element-data-type>;
 ```
 
 ```js
-nums as int array of 10;
+nums as array of 10 int;
 ```
 
 Square braces `[ ]` are used to denote lists for arrays. Each element in the list must be of the same type, and are separated by comma `,`. If an array is declared and initialized with a list of elements, the length of the array can be infered and omitted from the declaration.
 
 ```js
-nums as int array = [1,2,3,4,5];
+nums as array of int = [1,2,3,4,5];
 ```
 
 An element of the array can be accessed using the array access operator `[ ]` which is appended to the left of an array identifier and contains an integer. It references a corresponding element where the integer is the index position of that element, allowing both read and write operations. An integer that is negative or greater than or equal to the array causes a runtime error. Indexes of array elements begin at 0.
 
 ```js
-nums as int array = [2,4,6,8,10];
+nums as array of int = [2,4,6,8,10];
 
 
 nums[0] = 1; // Assign to 1
@@ -171,25 +170,19 @@ Arrays can store any data, even other arrays. Storing arrays inside of arrays ma
 To declare a multi-dimensional array, replace the data type to an array type:
 
 ```js
-// Parenthesis added for clarity
+// num is an array of 5 arrays of 10 integers
+// 50 total elements
+nums as array of 5 array of 10 int;
 
-nums as (int) array of 5; // Data type is int
-
-nums as (int array of 10) array of 5 // int -> int array
-```
-
-```js
-// nums is an array of 5 elements of integer arrays of 10 elements
-nums as int array of 10 array of 5
-
-// nums is an array of 2 elements of arrays of 3 elements of integer array with 4 elements
-nums as int array of 4 array of 3 array of 2;
+// nums is an array of 5 arrays of 10 arrays of 15 integers.
+// 750 total elements
+nums as array of 5 array of 10 array of 15 int;
 ```
 
 You can initialize the multi-dimensional array with an existing list to omit verbose code:
 
 ```js
-nums as int array array = [
+nums as array of array of int = [
     [1,2,3],
     [4,5,6],
     [7,8,9]
@@ -199,7 +192,7 @@ nums as int array array = [
 Values in multi-dimensional arrays can be accessed, read, and wrote to using chained array access operators `[ ]` to refernce the element. The leftmost access operator references the top array and the rightmost access operator references the element.
 
 ```js
-nums as int array array = [
+nums as array of array of int = [
     [1,2,3],
     [4,5,6],
     [7,8,9]
@@ -211,28 +204,43 @@ num2 = nums[1][1] // nums5 == 5
 num3 = nums[3][1] // Runtime error
 ```
 
-### Strict Arrays
+### Array and Array Element Modifiers
 
-A strict array has elements that do not use the default values. When an element of a strict array is accessed before it was assigned a value, a runtime error is occured.
+Modifiers that are used for variables can also be applied for arrays and its elements.
 
-To declare an array as a strict array, add the `strict` modifier keyword in the array declaration:
+The `strict` keyword when used on an array declaration turns the array into a strict array. A strict array will cause a runtime error when accessing any of its elements before all of its elements are explicitly initialized.
+
+Using the `strict` modifier on its elements turns them into strict variables. Accessing an element before it is initialized will cause a runtime error.
 
 ```js
-nums as strict int array of 10;
-
-print(num[0]); // Runtime error
+nums as strict array of 5 int;
+print(nums[0]); // Runtime error
+nums[0] = 0;
+print(nums[0]) // Still runtime error; all elements need to initialized
 ```
 
-### Fixed Arrays
+```js
+nums as array of 5 strict int;
+print(nums[0]); // Runtime error
+nums[0] = 0;
+print(nums[0]) // No error
+print(nums[1]); // Runtime error; element at index 1 is not yet initialized
+```
 
-A fixed array has elements that are immutable and can only be assigned a value exactly once. Attempting to assign a new value to an element of a fixed array after it was already assigned a value will make a runtime error occur.
+The `fixed` keyword when used on an array declaration turns the array into a fixed array. A fixed array can be explicitly assigned a value only once. Assigning more than once makes a runtime error occur.
 
-To declare an array as a fixed array, add the `fixed` modifier keyword in the array declaration:
+When set as a modifier for the array elements, the elements are become `fixed` variables and cannot be assigned a new value after it was already assigned one.
 
 ```js
-nums as fixed int array;
-nums[0] = 10;
-nums[0] = 20; // Runtime error
+nums as fixed array of 5 int = [1,2,3,4,5];
+nums = [6,7,8,9,0] // Runtime error
+nums[0] = 100 // No error: only the array itself is immutable
+```
+
+```js
+nums as  array of 5 fixed int = [1,2,3,4,5];
+nums[0] = 100 // Runtime Error
+nums = [6,7,8,9,0] // No error: only the elements are immutable
 ```
 
 ## Operators
