@@ -12,4 +12,9 @@ public class Token {
     private String lexeme;
     private TokenType type;
 
+    @Override
+    public String toString() {
+        return "Token(lexeme=\'"+lexeme+"\', type="+type.toString()+")";
+    }
+
 }

@@ -123,7 +123,6 @@ public class LexicalAnalyzer {
                 continue;
             }
 
-            boolean checkPreUnaryOperator
             if (checkToken || symbol.toString().endsWith("/*")) {
                 String symbolStr = symbol.toString();
                 if (symbol.toString().endsWith("/*")) {

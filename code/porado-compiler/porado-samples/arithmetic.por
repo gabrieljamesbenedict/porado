@@ -1,4 +1,5 @@
 num as int = 42;
+otherNum as int = -10 + 5 * -1 + (++num * num--);
 
 // Arithmetic operations
 sum as int = num + 10;
