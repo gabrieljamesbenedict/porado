@@ -126,7 +126,7 @@ public class LexicalAnalyzer {
 
             // Newlines
             if (c == '\n') {
-                tokenArrayList.add(new Token("newline", TokenType.NEWLINE));
+                tokenArrayList.add(new Token("newline", TokenType.NEWLINE, TokenCategory.NEWLINE));
                 symbol.setLength(0);
                 continue;
             }
@@ -165,21 +165,21 @@ public class LexicalAnalyzer {
             // Token
             if (isTokenBreak) {
                 if (!current.isEmpty()) {
-                    if (current.startsWith("-") && current.length() > 1) {
-                        tokenArrayList.add(new Token("neg", TokenType.OPERATOR_NEGATIVE));
-                        current = current.substring(1);
-                    }
+//                    if (current.startsWith("-") && current.length() > 1) {
+//                        tokenArrayList.add(new Token("neg", TokenType.OPERATOR_NEGATIVE));
+//                        current = current.substring(1);
+//                    }
                     TokenType literalType = checkIfLiteral(current);
                     if (literalType != null) {
-                        addToken(current, literalType, tokenArrayList);
+                        addToken(current, literalType, TokenCategory.LITERAL, tokenArrayList);
                     } else {
-                        addToken(current, KEYWORDS, tokenArrayList);
+                        addToken(current, KEYWORDS, TokenCategory.IDENTIFIER, tokenArrayList);
                     }
                     symbol.setLength(0);
                 }
 
                 if (isDelimiter) {
-                    addToken(String.valueOf(c), DELIMITERS, tokenArrayList);
+                    addToken(String.valueOf(c), DELIMITERS, TokenCategory.DELIMITER, tokenArrayList);
                 } else if (isOperator) {
                     char check = (char) codeReader.read();
 
@@ -212,20 +212,20 @@ public class LexicalAnalyzer {
                                     && check == '-';
 
                     if (Character.isLetterOrDigit(check)) {
-                        addToken("neg_op", TokenType.OPERATOR_NEGATIVE, tokenArrayList);
+                        addToken("neg_op", TokenType.OPERATOR_NEGATIVE, TokenCategory.OPERATOR, tokenArrayList);
                         codeReader.unread(check);
                         continue;
                     }
 
                     if (isIncrement) {
-                        addToken("++", TokenType.OPERATOR_INCREMENT, tokenArrayList);
+                        addToken("++", TokenType.OPERATOR_INCREMENT, TokenCategory.OPERATOR, tokenArrayList);
                         continue;
                     } else if (isDecrement) {
-                        addToken("--", TokenType.OPERATOR_DECREMENT, tokenArrayList);
+                        addToken("--", TokenType.OPERATOR_DECREMENT, TokenCategory.OPERATOR, tokenArrayList);
                         continue;
                     }
                     else codeReader.unread(check);
-                    addToken(String.valueOf(c), KEYWORDS, tokenArrayList);
+                    addToken(String.valueOf(c), KEYWORDS, TokenCategory.OPERATOR, tokenArrayList);
                 }
 
                 continue;
@@ -238,6 +238,7 @@ public class LexicalAnalyzer {
                 .builder()
                 .lexeme("eof")
                 .type(TokenType.EOF)
+                .category(TokenCategory.EOF)
                 .build();
         tokenArrayList.add(eof);
 
@@ -249,12 +250,12 @@ public class LexicalAnalyzer {
         return tokenStream;
     }
 
-    private static void addToken(String lexeme, Map<String, TokenType> lookup, List<Token> list) {
+    private static void addToken(String lexeme, Map<String, TokenType> lookup, TokenCategory category, List<Token> list) {
         TokenType type = lookup.getOrDefault(lexeme, TokenType.IDENTIFIER);
-        list.add(new Token(lexeme, type));
+        list.add(new Token(lexeme, type, category));
     }
-    private static void addToken(String lexeme, TokenType type, List<Token> list) {
-        list.add(new Token(lexeme, type));
+    private static void addToken(String lexeme, TokenType type, TokenCategory category, List<Token> list) {
+        list.add(new Token(lexeme, type, category));
     }
 
     private TokenType checkIfLiteral (String compare) {
