@@ -91,6 +91,7 @@ public class LexicalAnalyzer {
         entry("(", TokenType.DELIMITER_LPARENTH),
         entry(")", TokenType.DELIMITER_RPARENTH),
         entry(",", TokenType.DELIMITER_COMMA),
+        entry(":", TokenType.DELIMITER_COLON),
         entry(";", TokenType.DELIMITER_SEMICOLON)
     );
 
