@@ -325,8 +325,8 @@ When an expression contains two or more operations, certain operators are evalua
 | 6 | `==`, `!=` | - |
 | 7 | `not` | - |
 | 8 | `and`, `nand` | - |
-| 9 | `or`, `nor` | - |
-| 10 | `xor`, `xnor` | - |
+| 9 | `xor`, `xnor` | - |
+| 10 | `or`, `nor` | - |
 | 11 | `=` | - |
 
 ## Conditionals
