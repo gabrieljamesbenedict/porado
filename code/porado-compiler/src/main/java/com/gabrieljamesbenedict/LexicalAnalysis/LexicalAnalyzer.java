@@ -103,8 +103,6 @@ public class LexicalAnalyzer {
         StringBuilder symbol = new StringBuilder();
         ArrayList<Token> tokenArrayList = new ArrayList<>();
 
-
-
         while (codeReader.ready()) {
             char c = (char) codeReader.read();
 
@@ -115,60 +113,14 @@ public class LexicalAnalyzer {
 
             String current = symbol.toString();
 
-//            // Comments
-//            if (current.equals("//")) {
-//                while (codeReader.ready() && c != '\n') {
-//                    c = (char) codeReader.read();
-//                }
-//                symbol.setLength(0);
-//                continue;
-//            }
-
-            // Newlines
             if (c == '\n') {
                 tokenArrayList.add(new Token("newline", TokenType.NEWLINE, TokenCategory.NEWLINE));
                 symbol.setLength(0);
                 continue;
             }
 
-//            // Increment and Decrement
-//            if (current.equals("++") || current.equals("--")) {
-//                addToken(current, KEYWORDS, tokenArrayList);
-//                symbol.setLength(0);
-//                continue;
-//            }
-//            if (current.endsWith("++") || current.endsWith("--")) {
-//                String base = current.substring(0, current.length() - 2);
-//                String op   = current.substring(current.length() - 2);
-//
-//                addToken(base, KEYWORDS, tokenArrayList);
-//                addToken(op, KEYWORDS, tokenArrayList);
-//
-//                symbol.setLength(0);
-//                continue;
-//            }
-
-//            // Multiline Comments
-//            if (current.endsWith("/*")) {
-//                String beforeComment = current.substring(0, current.length() - 2);
-//                if (!beforeComment.isEmpty()) addToken(beforeComment, KEYWORDS, tokenArrayList);
-//
-//                while (codeReader.ready() && !symbol.toString().endsWith("*/")) {
-//                    c = (char) codeReader.read();
-//                    symbol.append(c);
-//                }
-//
-//                symbol.setLength(0);
-//                continue;
-//            }
-
-            // Token
             if (isTokenBreak) {
                 if (!current.isEmpty()) {
-//                    if (current.startsWith("-") && current.length() > 1) {
-//                        tokenArrayList.add(new Token("neg", TokenType.OPERATOR_NEGATIVE));
-//                        current = current.substring(1);
-//                    }
                     TokenType literalType = checkIfLiteral(current);
                     if (literalType != null) {
                         addToken(current, literalType, TokenCategory.LITERAL, tokenArrayList);
