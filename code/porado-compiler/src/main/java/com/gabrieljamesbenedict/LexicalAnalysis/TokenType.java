@@ -86,6 +86,7 @@ public enum TokenType {
     LITERAL_FALSE,
 
     IDENTIFIER,
+    WHITESPACE,
     NEWLINE,
     EOF
 

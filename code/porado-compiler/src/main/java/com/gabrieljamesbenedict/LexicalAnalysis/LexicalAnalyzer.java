@@ -1,7 +1,9 @@
 package com.gabrieljamesbenedict.LexicalAnalysis;
 
+import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
 
+import javax.xml.catalog.Catalog;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
@@ -19,7 +21,6 @@ import java.util.stream.Stream;
 public class LexicalAnalyzer {
 
     private static final Map<String, TokenType> KEYWORDS = Map.<String, TokenType>ofEntries(
-            // Keywords
             entry("as", TokenType.KEYWORD_AS),
             entry("strict", TokenType.KEYWORD_STRICT),
             entry("fixed", TokenType.KEYWORD_FIXED),
@@ -45,16 +46,18 @@ public class LexicalAnalyzer {
             entry("accepts", TokenType.KEYWORD_ACCEPTS),
             entry("returns", TokenType.KEYWORD_RETURNS),
             entry("return", TokenType.KEYWORD_RETURN),
-            entry("print", TokenType.KEYWORD_PRINT),
+            entry("print", TokenType.KEYWORD_PRINT)
+    );
 
-            // Data Types
+    private static final Map<String, TokenType> TYPES = Map.<String, TokenType>ofEntries(
             entry("int", TokenType.TYPE_INT),
             entry("float", TokenType.TYPE_FLOAT),
             entry("char", TokenType.TYPE_CHAR),
             entry("string", TokenType.TYPE_STRING),
-            entry("boolean", TokenType.TYPE_BOOLEAN),
+            entry("boolean", TokenType.TYPE_BOOLEAN)
+    );
 
-            // Operators
+    private static final Map<String, TokenType> OPERATORS = Map.<String, TokenType>ofEntries(
             entry("+", TokenType.OPERATOR_PLUS),
             entry("-", TokenType.OPERATOR_MINUS),
             entry("*", TokenType.OPERATOR_TIMES),
@@ -95,7 +98,7 @@ public class LexicalAnalyzer {
         entry(";", TokenType.DELIMITER_SEMICOLON)
     );
 
-    private static final Set<Character> OPERATORS = Set.of(
+    private static final Set<Character> operators = Set.of(
         '+','-','*','/','%'
     );
 
@@ -109,7 +112,7 @@ public class LexicalAnalyzer {
 
             boolean isWhitespace = (c == ' ' || c == '\t' || c == '\r');
             boolean isDelimiter  = DELIMITERS.containsKey(String.valueOf(c));
-            boolean isOperator   = OPERATORS.contains(c);
+            boolean isOperator   = operators.contains(c);
             boolean isTokenBreak = isWhitespace || isDelimiter || isOperator;
 
             String current = symbol.toString();
@@ -120,19 +123,19 @@ public class LexicalAnalyzer {
                 continue;
             }
 
+            if (isWhitespace) {
+                tokenArrayList.add(new Token("whitespace", TokenType.WHITESPACE, TokenCategory.WHITESPACE));
+            }
+
             if (isTokenBreak) {
+
                 if (!current.isEmpty()) {
-                    TokenType literalType = checkIfLiteral(current);
-                    if (literalType != null) {
-                        addToken(current, literalType, TokenCategory.LITERAL, tokenArrayList);
-                    } else {
-                        addToken(current, KEYWORDS, TokenCategory.IDENTIFIER, tokenArrayList);
-                    }
+                    addToken(current, tokenArrayList);
                     symbol.setLength(0);
                 }
 
                 if (isDelimiter) {
-                    addToken(String.valueOf(c), DELIMITERS, TokenCategory.DELIMITER, tokenArrayList);
+                    addToken(String.valueOf(c), tokenArrayList);
                 } else if (isOperator) {
                     char check = (char) codeReader.read();
 
@@ -165,20 +168,20 @@ public class LexicalAnalyzer {
                                     && check == '-';
 
                     if (Character.isLetterOrDigit(check)) {
-                        addToken("neg_op", TokenType.OPERATOR_NEGATIVE, TokenCategory.OPERATOR, tokenArrayList);
+                        addToken("neg_op", tokenArrayList);
                         codeReader.unread(check);
                         continue;
                     }
 
                     if (isIncrement) {
-                        addToken("++", TokenType.OPERATOR_INCREMENT, TokenCategory.OPERATOR, tokenArrayList);
+                        addToken("++", tokenArrayList);
                         continue;
                     } else if (isDecrement) {
-                        addToken("--", TokenType.OPERATOR_DECREMENT, TokenCategory.OPERATOR, tokenArrayList);
+                        addToken("--", tokenArrayList);
                         continue;
                     }
                     else codeReader.unread(check);
-                    addToken(String.valueOf(c), KEYWORDS, TokenCategory.OPERATOR, tokenArrayList);
+                    addToken(String.valueOf(c), tokenArrayList);
                 }
 
                 continue;
@@ -194,52 +197,33 @@ public class LexicalAnalyzer {
                 .category(TokenCategory.EOF)
                 .build();
         tokenArrayList.add(eof);
-
-        // Clean Token Stream
-
         TokenPostProcesser postProcesser = new TokenPostProcesser();
 
         return postProcesser.clean(tokenArrayList.stream());
     }
 
-    private static void addToken(String lexeme, Map<String, TokenType> lookup, TokenCategory category, List<Token> list) {
-        TokenType type = lookup.getOrDefault(lexeme, TokenType.IDENTIFIER);
-        list.add(new Token(lexeme, type, category));
-    }
-    private static void addToken(String lexeme, TokenType type, TokenCategory category, List<Token> list) {
-        list.add(new Token(lexeme, type, category));
-    }
 
-    private TokenType checkIfLiteral (String compare) {
-        final String literalInt = "[0-9]+";
-        final String literalFloat = "[0-9]+\\.[0-9]+";
-        final String literalChar = "^\'(.)*\'$";
-        final String literalString = "^\"(.)*\"$";
-        final String literalTrue = "true";
-        final String literalFalse = "false";
-        final String[] literalRegexArray = {
-                literalInt, literalFloat, literalChar, literalString, literalTrue, literalFalse
-        };
-
-        int type = -1;
-        for (int i = 0; i < 5; i++) {
-            Pattern pattern = Pattern.compile(literalRegexArray[i], Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(compare);
-            if (matcher.matches()) {
-                type = i;
-                break;
-            }
+    private static void addToken(String lexeme, List<Token> list) {
+        TokenType type;
+        TokenCategory category;
+        if (KEYWORDS.containsKey(lexeme)) {
+            type = KEYWORDS.get(lexeme);
+            category = TokenCategory.KEYWORD;
+        } else if (TYPES.containsKey(lexeme)) {
+            type = TYPES.get(lexeme);
+            category = TokenCategory.TYPE;
+        } else if (OPERATORS.containsKey(lexeme)) {
+            type = OPERATORS.get(lexeme);
+            category = TokenCategory.OPERATOR;
+        } else if (DELIMITERS.containsKey(lexeme)) {
+            type = DELIMITERS.get(lexeme);
+            category = TokenCategory.DELIMITER;
+        } else {
+            type = TokenType.IDENTIFIER;
+            category = TokenCategory.IDENTIFIER;
         }
 
-        return switch (type) {
-            case 0 -> TokenType.LITERAL_INT;
-            case 1 -> TokenType.LITERAL_FLOAT;
-            case 2 -> TokenType.LITERAL_CHAR;
-            case 3 -> TokenType.LITERAL_STRING;
-            case 4 -> TokenType.LITERAL_TRUE;
-            case 5 -> TokenType.LITERAL_FALSE;
-            default -> null;
-        };
+        list.add(new Token(lexeme, type, category));
     }
 }
 

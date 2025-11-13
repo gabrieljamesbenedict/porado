@@ -7,6 +7,7 @@ public enum TokenCategory {
     DELIMITER,
     LITERAL,
     IDENTIFIER,
+    WHITESPACE,
     NEWLINE,
     EOF
 }
