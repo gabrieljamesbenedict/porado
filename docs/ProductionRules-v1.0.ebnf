@@ -1,0 +1,304 @@
+(*  
+    Production Rules
+    Version: 1.0
+    Author: Gabriel James Benedict
+    Description:
+    Simple CFG production rules implemented using EBNF for Syntax Analysis
+ *)
+
+
+program =
+    statement {statement}
+    ;
+
+statement =
+    single-statement
+    | block-statement
+    ;
+single-statement =
+    [(
+        expression
+        | declaration-statement
+        | conditional-statement
+        | switch-statement
+        | loop-statement
+    )],
+    "DELIMITER_SEMICOLON"
+    ;
+block-statement =
+    "DELIMITER_LBRACKET", {single-statement}, "DELIMITER_RBRACKET"
+    ;
+
+data-type =
+    "TYPE_INT"
+    | "TYPE_FLOAT"
+    | "TYPE_CHAR"
+    | "TYPE_STRING"
+    | "TYPE_BOOLEAN"
+    ;
+
+literal =
+    "LITERAL_INT"
+    | "LITERAL_FLOAT"
+    | "LITERAL_CHAR"
+    | "LITERAL_STRING"
+    | "LITERAL_BOOLEAN"
+    ;
+
+array-literal =
+    "DELIMITER_LBRACE", [expression, {"KEYWORD_COMMA", expression}], "DELIMITER_RBRACE"
+    ;
+
+modifier =
+    { "KEYWORD_STRICT" | "KEYWORD_FIXED" }
+    ;
+
+
+(* DECLARATIONS *)
+declaration-statement =
+    "IDENTIFIER", "KEYWORD_AS", 
+    (
+        (
+            [array-specifier],
+            modifier, data-type,
+            [optional-initialization]
+        )
+        |
+        function-specifier
+    )
+    ;
+array-specifier =
+    modifier, "KEYWORD_ARRAY", "KEYWORD_OF", ("LITERAL_INT" | "IDENTIFIER")
+    ;
+function-specifier = 
+    "KEYWORD_FUNCTION", ["KEYWORD_ACCEPTS", function-parameters], ["KEYWORD_RETURNS", data-type], function-body
+    ;
+function-parameters =
+    "DELIMITER_LPARENTH", [parameter-declaration, {"DELIMITER_COMMA", parameter-declaration}], "DELIMITER_RPARENTH"
+    ;
+function-body =
+    block-statement
+    ;
+parameter-declaration =
+    "IDENTIFIER", "KEYWORD_AS", "TYPE_INT", ["OPERATOR_ASSIGN", ("LITERAL_INT" | "IDENTIFIER")]
+    ;
+optional-initialization =
+    "OPERATOR_ASSIGN", expression
+    ;
+
+
+(* CONDITIONALS *)
+conditional-statement =
+    "KEYWORD_IF",
+    "DELIMITER_LPARENTH", condition-expression, "DELIMITER_RPARENTH",
+    "KEYWORD_THEN",
+    conditional-body,
+    {else-if-substatement},
+    [else-substatement]
+    ;
+else-if-substatement = 
+    "KEYWORD_ELSE", "KEYWORD_IF",
+    "DELIMITER_LPARENTH", condition-expression, "DELIMITER_RPARENTH",
+    "KEYWORD_THEN",
+    conditional-body
+    ;
+else-substatement =
+    "KEYWORD_ELSE",
+    conditional-body
+    ;
+conditional-body =
+    statement
+    ;
+
+
+(* SWITCH *)
+switch-statement =
+    "KEYWORD_SWITCH",
+    "DELIMITER_LPARENTH", expression, "DELIMITER_RPARENTH",
+    "DELIMITER_LBRACKET", {case-statement}, "DELIMITER_RBRACKET"
+    ;
+case-statement =
+    "KEYWORD_CASE", "DELIMITER_LPARENTH", expression, "DELIMITER_RPARENTH", "DELIMITER_COLON", statement
+    |
+    "KEYWORD_DEFAULT", "DELIMITER_COLON", statement
+    ;
+
+
+(* LOOPS *)
+loop-statement =
+    while-statement
+    | do-while-statement
+    | for-statement
+    | repeat-statement
+    ;
+while-statement =
+    ("KEYWORD_WHILE" | "KEYWORD_UNTIL"),
+    "DELIMITER_LPARENTH", condition-expression, "DELIMITER_RPARENTH",
+    "KEYWORD_THEN",
+    loop-body
+    ;
+do-while-statement =
+    "KEYWORD_DO",
+    loop-body,
+    ("KEYWORD_WHILE" | "KEYWORD_UNTIL"),
+    "DELIMITER_LPARENTH", condition-expression, "DELIMITER_RPARENTH"
+    ;
+for-statement =
+    "KEYWORD_FOR",
+    "DELIMITER_LPARENTH", "KEYWORD_EACH", "IDENTIFIER", "KEYWORD_IN", ("IDENTIFIER" | array-literal), "DELIMITER_RPARENTH",
+    loop-body
+    ;
+repeat-statement =
+    "KEYWORD_REPEAT",
+    "DELIMITER_LPARENTH", [iteration-variable, "DELIMITER_COMMA"], ("LITERAL_INT" | "IDENTIFIER"), "DELIMITER_RPARENTH",
+    loop-body
+    ;
+iteration-variable =
+    "IDENTIFIER", "KEYWORD_AS", "TYPE_INT", ["OPERATOR_ASSIGN", ("LITERAL_INT" | "IDENTIFIER")]
+    ;
+loop-body =
+    statement
+    ;
+
+
+(* EXPRESSIONS *)
+expression =
+    arithmetic-expression
+    | assignment-expression
+    | comparison-expression
+    | logical-expression
+    | condition-expression
+    | atomic-expression
+    ;
+atomic-expression =
+    "IDENTIFIER"
+    | literal
+    | array-literal
+    | function-expression
+    ;
+
+
+(* ARITHMETIC *)
+arithmetic-expression =
+    arithmetic-term, {additive-operator, arithmetic-term}
+    ;
+arithmetic-term =
+    arithmetic-factor, {multiplicative-operator, arithmetic-factor}
+    ;
+arithmetic-factor = 
+    arithmetic-atom
+    | increment-expression
+    | decrement-expression
+    ;
+arithmetic-atom = 
+    "LITERAL_INT"
+    | "LITERAL_FLOAT"
+    | "IDENTIFIER"
+    | grouped-arithmetic-expression
+    | negative_atom
+    ;
+grouped-arithmetic-expression =
+    "DELIMITER_LPARENTH", arithmetic-expression, "DELIMITER_RPARENTH"
+    ;
+negative-atom =
+    "OPERATOR_NEGATIVE", arithmetic-atom
+    ;
+increment-expression =
+    "OPERATOR_INCREMENT", "IDENTIFIER"
+    | "IDENTIFIER", "OPERATOR_INCREMENT"
+    ;
+decrement-expression =
+    "OPERATOR_DECREMENT", "IDENTIFIER"
+    | "IDENTIFIER", "OPERATOR_DECREMENT"
+    ;
+additive-operator =
+    "OPERATOR_PLUS" | "OPERATOR_MINUS"
+    ;
+multiplicative-operator =
+    "OPERATOR_TIMES" | "OPERATOR_DIVIDE" | "OPERATOR_MODULO"
+    ;
+
+
+(* ASSIGNMENTS *)
+assignment-expression =
+    "IDENTIFIER", assignment-operator, expression
+    ;
+assignment-operator = 
+    "OPERATOR_ASSIGN"
+    | "OPERATOR_ASSIGNPLUS"
+    | "OPERATOR_ASSIGNMINUS"
+    | "OPERATOR_ASSIGNTIMES"
+    | "OPERATOR_ASSIGNDIVIDE"
+    | "OPERATOR_ASSIGNMODULO"
+    ;
+
+
+(* COMPARISONS *)
+comparison-expression =
+    nonequality-expression, equality-operator, nonequality-expression
+    ;
+nonequality-expression =
+    comparison-atom, [nonequality-operator, comparison-atom]
+    ;
+comparison-atom =
+    expression
+    | grouped-comparison-expression
+    ;
+grouped-comparison-expression =
+    "DELIMITER_LPARENTH", comparison-expression, "DELIMITER_RPARENTH"
+equality-operator = 
+    "OPERATOR_EQUALS"
+    | "OPERATOR_NOTEQUALS"
+    ;
+nonequality-operator =
+    "OPERATOR_GREATER"
+    | "OPERATOR_LESSER"
+    | "OPERATOR_GREATEREQUALS"
+    | "OPERATOR_LESSERQUALS"
+    ;
+
+
+(* LOGICALS *)
+logical-expression =
+    xor-expression, {or-operation, xor-expression}
+    ;
+xor-expression =
+    and-expression, {xor-operation, and-expression}
+    ;
+and-expression =
+    logical-atom, {and-operator, logical-atom}
+    ;
+logical-atom =
+    "LITERAL_TRUE"
+    | "LITERAL_FALSE"
+    | "IDENTIFIER"
+    | comparison-expression
+    | not-atom
+    ;
+not-atom =
+    "OPERATOR_NOT", logical-atom
+    ;
+or-operator =
+    "OPERATOR_OR"
+    | "OPERATOR_NOR"
+    ;
+xor-operator =
+    "OPERATOR_XOR"
+    | "OPERATOR_NXOR"
+    ;
+and-operator =
+    "OPERATOR_AND"
+    | "OPERATOR_NAND"
+    ;
+
+
+(* CONDITIONS *)
+condition-expression =
+    logical-expression
+    ;
+
+
+(* FUNCTIONS *)
+function-expression =
+    "IDENTIFIER", "DELIMITER_LPARENTH", {expression}, "DELIMITER_RPARENTH"
+    ;
