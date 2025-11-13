@@ -102,7 +102,7 @@ public class LexicalAnalyzer {
         '+','-','*','/','%'
     );
 
-    public Stream<Token> tokenize(PushbackReader codeReader) throws IOException {
+    public static Stream<Token> tokenize(PushbackReader codeReader) throws IOException {
 
         StringBuilder symbol = new StringBuilder();
         ArrayList<Token> tokenArrayList = new ArrayList<>();

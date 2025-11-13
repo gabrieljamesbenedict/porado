@@ -2,10 +2,13 @@ package com.gabrieljamesbenedict;
 
 import com.gabrieljamesbenedict.LexicalAnalysis.LexicalAnalyzer;
 import com.gabrieljamesbenedict.LexicalAnalysis.Token;
+import com.gabrieljamesbenedict.SyntaxAnalysis.AbstractSyntaxTree;
+import com.gabrieljamesbenedict.SyntaxAnalysis.SyntaxAnalyzer;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class PoradoCompiler
 {
@@ -39,9 +42,12 @@ public class PoradoCompiler
         for (File file : files) {
             try {
                 reader = new PushbackReader (new FileReader(file));
-                LexicalAnalyzer lexer = new LexicalAnalyzer();
 
-                for (Token token : lexer.tokenize(reader).toList()) {
+                // FIVE STEPS OF COMPILATION
+                Stream<Token> tokenStream = LexicalAnalyzer.tokenize(reader);
+                AbstractSyntaxTree ast = SyntaxAnalyzer.parse(tokenStream);
+
+                for (Token token : tokenStream.toList()) {
                     System.out.println(token.toString());
                 }
             } catch (FileNotFoundException e) {
