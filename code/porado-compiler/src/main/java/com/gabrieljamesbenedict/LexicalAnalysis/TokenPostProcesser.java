@@ -67,17 +67,72 @@ public class TokenPostProcesser {
             if (prev.getType() == TokenType.KEYWORD_ELSE &&
                     curr.getType() == TokenType.KEYWORD_IF) {
 
-                // Replace the "else"
                 tokenList.set(i - 1, new Token(
                         "else-if",
                         TokenType.KEYWORD_ELSEIF,
                         TokenCategory.KEYWORD
                 ));
-
-                // Remove the "if"
                 tokenList.remove(i);
+                i--;
+            }
 
-                // Step back to avoid skipping a token
+            if (curr.getType() == TokenType.OPERATOR_ASSIGN &&
+                    prev.getType() == TokenType.OPERATOR_PLUS) {
+
+                tokenList.set(i - 1, new Token(
+                        "+=",
+                        TokenType.OPERATOR_ASSIGNPLUS,
+                        TokenCategory.OPERATOR
+                ));
+                tokenList.remove(i);
+                i--;
+            }
+
+            if (curr.getType() == TokenType.OPERATOR_ASSIGN &&
+                    prev.getType() == TokenType.OPERATOR_MINUS) {
+
+                tokenList.set(i - 1, new Token(
+                        "-=",
+                        TokenType.OPERATOR_ASSIGNMINUS,
+                        TokenCategory.OPERATOR
+                ));
+                tokenList.remove(i);
+                i--;
+            }
+
+            if (curr.getType() == TokenType.OPERATOR_ASSIGN &&
+                    prev.getType() == TokenType.OPERATOR_TIMES) {
+
+                tokenList.set(i - 1, new Token(
+                        "*=",
+                        TokenType.OPERATOR_ASSIGNTIMES,
+                        TokenCategory.OPERATOR
+                ));
+                tokenList.remove(i);
+                i--;
+            }
+
+            if (curr.getType() == TokenType.OPERATOR_ASSIGN &&
+                    prev.getType() == TokenType.OPERATOR_DIVIDE) {
+
+                tokenList.set(i - 1, new Token(
+                        "/=",
+                        TokenType.OPERATOR_ASSIGNDIVIDE,
+                        TokenCategory.OPERATOR
+                ));
+                tokenList.remove(i);
+                i--;
+            }
+
+            if (curr.getType() == TokenType.OPERATOR_ASSIGN &&
+                    prev.getType() == TokenType.OPERATOR_MODULO) {
+
+                tokenList.set(i - 1, new Token(
+                        "%=",
+                        TokenType.OPERATOR_ASSIGNMODULO,
+                        TokenCategory.OPERATOR
+                ));
+                tokenList.remove(i);
                 i--;
             }
         }
