@@ -136,6 +136,29 @@ public class SyntaxAnalyzer {
                 stmt.addChild(parseExpression(it));
         }
 
+        // Break
+        else if (current.getType() == TokenType.KEYWORD_BREAK) {
+            it.next();
+            if (doLogging) System.out.println("Parsing Break Statement");
+            stmt = addNode(NodeType.BREAK, null, parent);
+        }
+
+        // Continue
+        else if (current.getType() == TokenType.KEYWORD_CONTINUE) {
+            it.next();
+            if (doLogging) System.out.println("Parsing Continue Statement");
+            stmt = addNode(NodeType.CONTINUE, null, parent);
+        }
+
+        // Print
+        else if (current.getType() == TokenType.KEYWORD_PRINT) {
+            it.next();
+            if (doLogging) System.out.println("Parsing Print Statement");
+            stmt = addNode(NodeType.PRINT, null, parent);
+            Node printExpr = parseExpression(it);
+            stmt.addChild(printExpr);
+        }
+
         // Expression
         else if (isExpression(current)) {
             if (doLogging) System.out.println("Parsing Expression");
@@ -169,7 +192,7 @@ public class SyntaxAnalyzer {
     }
 
     private static Node parseLiteralArray(TokenIterator it) throws CompileException {
-        Node loopArr = addNode(NodeType.LITERAL_ARRAY, "ARRAY", null);
+        Node loopArr = addNode(NodeType.LITERAL_ARRAY,  null, null);
         while (it.peek().getType() != TokenType.DELIMITER_RBRACKET) {
             Token token = it.next();
             Node arrEl = addNode(NodeType.ARRAY_ELEMENT, token.getLexeme(), loopArr);
@@ -509,7 +532,9 @@ public class SyntaxAnalyzer {
                     || next.getCategory() == TokenCategory.TYPE
                     || (next.getCategory() == TokenCategory.DELIMITER
                     && next.getType() != TokenType.DELIMITER_LPARENTH
-                    && next.getType() != TokenType.DELIMITER_RPARENTH)) {
+                    && next.getType() != TokenType.DELIMITER_RPARENTH
+                    && next.getType() != TokenType.DELIMITER_LBRACKET
+                    && next.getType() != TokenType.DELIMITER_RBRACKET)) {
                 break;
             }
             tokens.add(next);
@@ -737,7 +762,28 @@ public class SyntaxAnalyzer {
 
     // Unary operators
     private static Node parseUnary(TokenIterator it) throws CompileException {
-        if (it.match(TokenType.OPERATOR_NEGATIVE)) {
+
+        // Pre-increment / Pre-decrement
+        if (it.match(TokenType.OPERATOR_INCREMENT)) {
+            Node node = new Node();
+            node.setType(NodeType.PRE_INCREMENT);
+            node.setText("++");
+            Node child = parseUnary(it);
+            if (child == null) throw new CompileException("Expected expression after ++");
+            node.addChild(child);
+            return node;
+        } else if (it.match(TokenType.OPERATOR_DECREMENT)) {
+            Node node = new Node();
+            node.setType(NodeType.PRE_DECREMENT);
+            node.setText("--");
+            Node child = parseUnary(it);
+            if (child == null) throw new CompileException("Expected expression after --");
+            node.addChild(child);
+            return node;
+        }
+
+        // Unary minus / not
+        else if (it.match(TokenType.OPERATOR_NEGATIVE)) {
             Node node = new Node();
             node.setType(NodeType.NEGATIVE);
             node.setText("-");
@@ -753,9 +799,29 @@ public class SyntaxAnalyzer {
             if (child == null) throw new CompileException("Expected expression after !");
             node.addChild(child);
             return node;
-        } else {
+        }
+
+        // Atomic expressions
+        else {
             System.out.println("Going atomic.");
-            return parseAtomic(it);
+            Node node = parseAtomic(it);
+
+            // Post-increment / Post-decrement
+            if (it.match(TokenType.OPERATOR_INCREMENT)) {
+                Node postNode = new Node();
+                postNode.setType(NodeType.POST_INCREMENT);
+                postNode.setText("++");
+                postNode.addChild(node);
+                node = postNode;
+            } else if (it.match(TokenType.OPERATOR_DECREMENT)) {
+                Node postNode = new Node();
+                postNode.setType(NodeType.POST_DECREMENT);
+                postNode.setText("--");
+                postNode.addChild(node);
+                node = postNode;
+            }
+
+            return node;
         }
     }
 
@@ -784,14 +850,15 @@ public class SyntaxAnalyzer {
 
         // Identifiers (variables, arrays, function calls)
         else if (it.match(TokenType.IDENTIFIER)) {
-            node.setType(NodeType.VARIABLE_TYPE);
+            node.setType(NodeType.VARIABLE_ACCESS);
 
             // Array access
-            if (it.match(TokenType.DELIMITER_LBRACE)) {
+            if (it.match(TokenType.DELIMITER_LBRACKET)) {
                 Node index = parseExpression(it);
                 node.addChild(index);
-                node.setType(NodeType.ARRAY_NAME);
+                node.setType(NodeType.ARRAY_ACCESS);
             }
+
             // Function call
             else if (it.match(TokenType.DELIMITER_LPARENTH)) {
                 Node args = new Node();
@@ -805,7 +872,7 @@ public class SyntaxAnalyzer {
                 }
 
                 node.addChild(args);
-                node.setType(NodeType.FUNCTION_NAME);
+                node.setType(NodeType.FUNCTION_CALL);
             }
         }
 
