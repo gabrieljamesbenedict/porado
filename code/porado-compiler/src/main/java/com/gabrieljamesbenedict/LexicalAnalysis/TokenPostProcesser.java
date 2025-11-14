@@ -12,18 +12,7 @@ public class TokenPostProcesser {
 
     public Stream<Token> clean(Stream<Token> tokenStream) {
 
-        List<Token> tokenList = tokenStream.toList();
-        for (int i = 1; i < tokenList.size()-1; i++) {
-            if (
-                    (tokenList.get(i-1).getCategory() != TokenCategory.LITERAL && tokenList.get(i-1).getCategory() != TokenCategory.IDENTIFIER)
-                    && (tokenList.get(i-1).getType() != TokenType.OPERATOR_INCREMENT || tokenList.get(i-1).getType() != TokenType.OPERATOR_DECREMENT)
-                    && (tokenList.get(i).getType() == TokenType.OPERATOR_MINUS)
-            ) {
-                tokenList.get(i).setType(TokenType.OPERATOR_NEGATIVE);
-            }
-        }
-
-        return tokenList.stream()
+        Stream<Token> s =tokenStream
                 .peek(
                         token -> {
                             if (checkIfLiteral(token.getLexeme()) != null) {
@@ -46,6 +35,21 @@ public class TokenPostProcesser {
                 ).filter(
                         token -> token.getCategory() != TokenCategory.WHITESPACE
                 );
+
+        List<Token> tokenList = s.toList();
+        for (int i = 1; i < tokenList.size()-1; i++) {
+            if (
+                    (
+                            !(tokenList.get(i-1).getType() == TokenType.OPERATOR_INCREMENT || tokenList.get(i-1).getType() == TokenType.OPERATOR_DECREMENT)
+                            && (tokenList.get(i-1).getCategory() == TokenCategory.OPERATOR)
+                    )
+                            && (tokenList.get(i).getType() == TokenType.OPERATOR_MINUS)
+            ) {
+                tokenList.get(i).setType(TokenType.OPERATOR_NEGATIVE);
+            }
+        }
+
+        return tokenList.stream();
     }
 
     private TokenType checkIfLiteral (String compare) {
