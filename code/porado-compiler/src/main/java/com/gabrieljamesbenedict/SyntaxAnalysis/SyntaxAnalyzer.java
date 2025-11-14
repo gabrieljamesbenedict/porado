@@ -20,7 +20,7 @@ public class SyntaxAnalyzer {
         programToken.setType(TokenType.PROGRAM);
         programToken.setCategory(TokenCategory.PROGRAM);
         programToken.setLexeme("Program");
-        Node programNode = addNode(NodeType.PROGRAM, "Program", null);
+        Node programNode = addNode(NodeType.PROGRAM, null, null);
         AST.setRoot(programNode);
 
         parseProgram(it, programNode);
@@ -63,8 +63,12 @@ public class SyntaxAnalyzer {
 
         System.out.println("Single Statement");
         Node stmt = parseSingleStatement(it, parent);
-        if (it.previous().getType() != TokenType.DELIMITER_RBRACE) {
-            System.out.println("Wheres the semicolon?");
+        // Only expect semicolon if it is a statement that needs it
+
+        if (it.previous().getType() != TokenType.DELIMITER_RBRACE
+        && it.previous().getType() != TokenType.EOF
+        && it.previous().getType() != TokenType.DELIMITER_SEMICOLON)
+        {
             it.expect(TokenType.DELIMITER_SEMICOLON);
         }
 
@@ -78,7 +82,8 @@ public class SyntaxAnalyzer {
         Node block = addNode(NodeType.BLOCK_STATEMENT, null, parent);
 
         while (!it.eof() && it.peek().getType() != TokenType.DELIMITER_RBRACE) {
-            parseStatement(it, block);
+            Node node = parseStatement(it, null);
+            block.addChild(node);
         }
 
         it.expect(TokenType.DELIMITER_RBRACE);
@@ -295,7 +300,8 @@ public class SyntaxAnalyzer {
             }
 
             System.out.println("Check function body");
-            parseStatement(it, addNode(NodeType.FUNCTION_BODY, null, decl));
+            Node functionBody = addNode(NodeType.FUNCTION_BODY, null, decl);
+            parseStatement(it, functionBody);
 
         }
 
@@ -330,7 +336,7 @@ public class SyntaxAnalyzer {
             ifCondition.addChild(parseExpression(it));
             it.expect(TokenType.KEYWORD_THEN);
             Node ifBody = addNode(NodeType.IF_BODY, null, ifNode);
-            ifBody.addChild(parseStatement(it, ifNode));
+            ifBody.addChild(parseStatement(it, null));
         } else {
             throw new CompileException("Syntax Error: Expected if keyword");
         }
@@ -341,14 +347,14 @@ public class SyntaxAnalyzer {
             elseifCondition.addChild(parseExpression(it));
             it.expect(TokenType.KEYWORD_THEN);
             Node elseifBody = addNode(NodeType.ELSE_IF_BODY, null, elseifNode);
-            elseifBody.addChild(parseStatement(it, elseifNode));
+            elseifBody.addChild(parseStatement(it, null));
         }
 
         if (it.match(TokenType.KEYWORD_ELSE)) {
             Node elseNode = addNode(NodeType.ELSE, null, cond);
             it.expect(TokenType.KEYWORD_THEN);
             Node elseifBody = addNode(NodeType.ELSE_BODY, null, elseNode);
-            elseifBody.addChild(parseStatement(it, elseNode));
+            elseifBody.addChild(parseStatement(it, null));
         }
 
         return cond;
@@ -403,14 +409,65 @@ public class SyntaxAnalyzer {
             Node loopNode = addNode(NodeType.WHILE, null, loop);
             Node loopCondition = addNode(NodeType.LOOP_CONDITION, null, loopNode);
             loopCondition.addChild(parseExpression(it));
+            it.expect(TokenType.KEYWORD_THEN);
             Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
+            parseStatement(it, loopBody);
         }
 
         else if (it.match(TokenType.KEYWORD_UNTIL)) {
             Node loopNode = addNode(NodeType.UNTIL, null, loop);
             Node loopCondition = addNode(NodeType.LOOP_CONDITION, null, loopNode);
             loopCondition.addChild(parseExpression(it));
+            it.expect(TokenType.KEYWORD_THEN);
             Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
+            parseStatement(it, loopBody);
+        }
+
+        else if (it.match(TokenType.KEYWORD_DO)) {
+            Node loopNode = addNode(null, null, loop);
+            Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
+            parseStatement(it, loopBody);
+            if (it.match(TokenType.KEYWORD_WHILE)) {
+                loopNode.setType(NodeType.DO_WHILE);
+            } else if (it.match(TokenType.KEYWORD_UNTIL)) {
+                loopNode.setType(NodeType.UNTIL);
+            } else {
+                throw new CompileException("Syntax Error: Expected when or until keyword");
+            }
+            Node loopCondition = addNode(NodeType.LOOP_CONDITION, null, loopNode);
+            loopCondition.addChild(parseExpression(it));
+        }
+
+        else if (it.match(TokenType.KEYWORD_FOR)) {
+            Node loopNode = addNode(NodeType.FOR, null, loop);
+            it.expect(TokenType.DELIMITER_LPARENTH);
+            it.expect(TokenType.KEYWORD_EACH);
+            Token t1 = it.expect(TokenType.IDENTIFIER);
+            it.expect(TokenType.KEYWORD_IN);
+            Token t2 = it.expect(TokenType.IDENTIFIER);
+            it.expect(TokenType.DELIMITER_RPARENTH);
+            Node loopVar = addNode(NodeType.FOR_VARIABLE, null, loopNode);
+            Node loopArr = addNode(NodeType.FOR_ARRAY, null, loopNode);
+            Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
+            parseStatement(it, loopBody);
+        }
+
+        else if (it.match(TokenType.KEYWORD_REPEAT)) {
+            Node loopNode = addNode(NodeType.REPEAT, null, loop);
+            Node loopAmount = addNode(NodeType.REPEAT_AMOUNT, null, loopNode);
+            loopAmount.addChild(parseExpression(it));
+            if (it.match(TokenType.KEYWORD_WITH)) {
+                Token t1 = it.expect(TokenType.IDENTIFIER);
+                it.expect(TokenType.KEYWORD_AS);
+                Token t2 = it.next(); if (t2.getCategory() != TokenCategory.TYPE) throw new CompileException("Syntax Error: Expected type in variable declaration");
+                Node repVar = addNode(NodeType.REPEAT_VARIABLE, t1.getLexeme(), loopNode);
+                if (it.match(TokenType.OPERATOR_ASSIGN)) {
+                    Token t3 = it.expect(TokenType.IDENTIFIER, TokenType.LITERAL_INT);
+                    Node repVarStart = addNode(NodeType.REPEAT_VARIABLE_START, null, loopNode);
+                }
+            }
+            Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
+            parseStatement(it, loopBody);
         }
 
         return loop;
