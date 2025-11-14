@@ -16,3 +16,10 @@ getNum as function returns int {
 setNum as function accepts (number as int) {
     num = num1;
 }
+
+if (num == 1) then num + 1
+else if (num == 2) then num + 2
+else if (num == 3) then num + 3
+else if (num == 4) then num + 4
+else if (num == 5) then num + 5
+else then num * 10;

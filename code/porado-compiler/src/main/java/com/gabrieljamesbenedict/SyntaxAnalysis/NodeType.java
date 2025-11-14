@@ -42,8 +42,13 @@ public enum NodeType {
 
     CONDITIONAL,
     IF,
-    ELSE,
+    IF_CONDITION,
+    IF_BODY,
     ELSE_IF,
+    ELSE_IF_CONDITION,
+    ELSE_IF_BODY,
+    ELSE,
+    ELSE_BODY,
 
     SWITCH,
     CASE,

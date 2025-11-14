@@ -94,14 +94,14 @@ public class SyntaxAnalyzer {
         }
 
         // Conditional
-        else if (it.match(TokenType.KEYWORD_IF)) {
+        else if (current.getType() == TokenType.KEYWORD_IF) {
             if (doLogging) System.out.println("Parsing Conditional");
             stmt = parseConditional(it, parent);
             return stmt;
         }
 
         // Switch
-        else if (it.match(TokenType.KEYWORD_SWITCH)) {
+        else if (current.getType() == TokenType.KEYWORD_SWITCH) {
             if (doLogging) System.out.println("Parsing Switch");
             stmt = parseSwitch(it, parent);
             return stmt;
@@ -115,7 +115,8 @@ public class SyntaxAnalyzer {
         }
 
         // Return
-        else if (it.match(TokenType.KEYWORD_RETURN)) {
+        else if (current.getType() == TokenType.KEYWORD_RETURN) {
+            it.next();
             if (doLogging) System.out.println("Parsing Return Statement");
             stmt = addNode(NodeType.RETURN_STATEMENT, it.previous().getLexeme(), parent);
             if (it.peek().getType() == TokenType.DELIMITER_SEMICOLON)
@@ -126,7 +127,8 @@ public class SyntaxAnalyzer {
         }
 
         // EOF
-        else if (it.match(TokenType.EOF)) {
+        else if (current.getType() == TokenType.EOF) {
+            it.next();
             if (doLogging) System.out.println("Parsing EOF");
             stmt = addNode(NodeType.EOF, "EOF", parent);
             return stmt;
@@ -141,6 +143,31 @@ public class SyntaxAnalyzer {
 
 
         throw new CompileException("Syntax Error: Unexpected statement " + current.getLexeme());
+    }
+
+    private static boolean isLoopKeyword(TokenType type) {
+        return type == TokenType.KEYWORD_WHILE
+                || type == TokenType.KEYWORD_UNTIL
+                || type == TokenType.KEYWORD_DO
+                || type == TokenType.KEYWORD_FOR
+                || type == TokenType.KEYWORD_REPEAT
+                ;
+    }
+
+    private static Node parseLiteralArray(TokenIterator it) throws CompileException {
+        Node loopArr = addNode(NodeType.LITERAL_ARRAY, "ARRAY", null);
+        while (it.peek().getType() != TokenType.DELIMITER_RBRACKET) {
+            Token token = it.next();
+            Node arrEl = addNode(NodeType.ARRAY_ELEMENT, token.getLexeme(), loopArr);
+            if (it.match(TokenType.DELIMITER_COMMA)) {
+                // Do nothing
+            } else if (it.match(TokenType.DELIMITER_RBRACKET)) {
+                break;
+            } else {
+                throw new CompileException("Syntax Error: Unexpected symbol in array literal " + it.peek().getLexeme());
+            }
+        }
+        return loopArr;
     }
 
     private static boolean isExpression(Token tok) {
@@ -287,32 +314,33 @@ public class SyntaxAnalyzer {
     // ---------------------------------------------------------------------------
 
     private static Node parseConditional(TokenIterator it, Node parent) throws CompileException {
-        Token token = it.expect(TokenType.KEYWORD_IF);
+        Node cond = addNode(NodeType.CONDITIONAL, null, parent);
 
-        Node cond = addNode(NodeType.CONDITIONAL, "CONDITIONAL", parent);
-
-        Node ifNode = addNode(NodeType.IF, "IF", cond);
-        it.expect(TokenType.DELIMITER_LPARENTH);
-        Node ifCondition = parseExpression(it);
-        it.expect(TokenType.DELIMITER_RPARENTH);
-        Node ifBody = parseStatement(it, cond);
-        ifNode.addAllChildren(ifCondition, ifBody);
-
-        // else-if chain
-        while (it.match(TokenType.KEYWORD_ELSE) && it.match(TokenType.KEYWORD_IF)) {
-            Node elifNode = addNode(NodeType.ELSE_IF, "ELSE-IF", cond);
-            it.expect(TokenType.DELIMITER_LPARENTH);
-            Node elifCondition = parseExpression(it);
-            it.expect(TokenType.DELIMITER_RPARENTH);
-            Node elifBody = parseStatement(it, elifNode);
-            elifNode.addAllChildren(elifCondition, elifBody);
+        if (it.match(TokenType.KEYWORD_IF)) {
+            Node ifNode = addNode(NodeType.IF, null, cond);
+            Node ifCondition = addNode(NodeType.IF_CONDITION, null, ifNode);
+            ifCondition.addChild(parseExpression(it));
+            it.expect(TokenType.KEYWORD_THEN);
+            Node ifBody = addNode(NodeType.IF_BODY, null, ifNode);
+            ifBody.addChild(parseStatement(it, ifNode));
+        } else {
+            throw new CompileException("Syntax Error: Expected if keyword");
         }
 
-        // else block
+        while (!it.eof() && it.match(TokenType.KEYWORD_ELSEIF)) {
+            Node elseifNode = addNode(NodeType.ELSE_IF, null, cond);
+            Node elseifCondition = addNode(NodeType.ELSE_IF_CONDITION, null, elseifNode);
+            elseifCondition.addChild(parseExpression(it));
+            it.expect(TokenType.KEYWORD_THEN);
+            Node elseifBody = addNode(NodeType.ELSE_IF_BODY, null, elseifNode);
+            elseifBody.addChild(parseStatement(it, elseifNode));
+        }
+
         if (it.match(TokenType.KEYWORD_ELSE)) {
-            Node elseNode = addNode(NodeType.ELSE_IF, "ELSE", cond);
-            it.expect(TokenType.DELIMITER_RPARENTH);
-            Node elseBody = parseStatement(it, elseNode);
+            Node elseNode = addNode(NodeType.ELSE, null, cond);
+            it.expect(TokenType.KEYWORD_THEN);
+            Node elseifBody = addNode(NodeType.ELSE_BODY, null, elseNode);
+            elseifBody.addChild(parseStatement(it, elseNode));
         }
 
         return cond;
@@ -478,32 +506,6 @@ public class SyntaxAnalyzer {
 
         throw new CompileException("Invalid loop");
     }
-
-    private static boolean isLoopKeyword(TokenType type) {
-        return type == TokenType.KEYWORD_WHILE
-                || type == TokenType.KEYWORD_UNTIL
-                || type == TokenType.KEYWORD_DO
-                || type == TokenType.KEYWORD_FOR
-                || type == TokenType.KEYWORD_REPEAT
-                ;
-    }
-
-    private static Node parseLiteralArray(TokenIterator it) throws CompileException {
-        Node loopArr = addNode(NodeType.LITERAL_ARRAY, "ARRAY", null);
-        while (it.peek().getType() != TokenType.DELIMITER_RBRACKET) {
-            Token token = it.next();
-            Node arrEl = addNode(NodeType.ARRAY_ELEMENT, token.getLexeme(), loopArr);
-            if (it.match(TokenType.DELIMITER_COMMA)) {
-                // Do nothing
-            } else if (it.match(TokenType.DELIMITER_RBRACKET)) {
-                break;
-            } else {
-                throw new CompileException("Syntax Error: Unexpected symbol in array literal " + it.peek().getLexeme());
-            }
-        }
-        return loopArr;
-    }
-
 
     // ---------------------------------------------------------------------------
     // EXPRESSION PARSER
