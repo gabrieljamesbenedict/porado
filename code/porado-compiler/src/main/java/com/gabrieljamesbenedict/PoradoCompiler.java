@@ -52,7 +52,6 @@ public class PoradoCompiler
                     System.out.println(token.toString());
                 }
 
-
                 AbstractSyntaxTree ast = SyntaxAnalyzer.parse(copy.stream());
 
                 System.out.println("AST:");

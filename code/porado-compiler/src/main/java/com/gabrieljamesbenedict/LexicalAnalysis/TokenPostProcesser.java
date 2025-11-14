@@ -37,13 +37,22 @@ public class TokenPostProcesser {
                 );
 
         List<Token> tokenList = s.toList();
-        for (int i = 1; i < tokenList.size()-1; i++) {
+        for (int i = 0; i < tokenList.size()-1; i++) {
+            if (i == 0) {
+                if (tokenList.get(i).getType() == TokenType.OPERATOR_MINUS) {
+                    tokenList.getFirst().setType(TokenType.OPERATOR_NEGATIVE);
+                }
+                continue;
+            }
+
             if (
-                    (
-                            !(tokenList.get(i-1).getType() == TokenType.OPERATOR_INCREMENT || tokenList.get(i-1).getType() == TokenType.OPERATOR_DECREMENT)
-                            && (tokenList.get(i-1).getCategory() == TokenCategory.OPERATOR)
+                    (tokenList.get(i-1).getCategory() == TokenCategory.OPERATOR
+                    || tokenList.get(i-1).getType() == TokenType.DELIMITER_LPARENTH
+                    || tokenList.get(i-1).getType() == TokenType.DELIMITER_LBRACKET
+                    || tokenList.get(i-1).getType() == TokenType.DELIMITER_COMMA
+                    || tokenList.get(i-1).getType() == TokenType.KEYWORD_RETURN
                     )
-                            && (tokenList.get(i).getType() == TokenType.OPERATOR_MINUS)
+                    && tokenList.get(i).getType() == TokenType.OPERATOR_MINUS
             ) {
                 tokenList.get(i).setType(TokenType.OPERATOR_NEGATIVE);
             }
@@ -60,7 +69,7 @@ public class TokenPostProcesser {
         final String literalTrue = "true";
         final String literalFalse = "false";
         final String[] literalRegexArray = {
-                literalInt, literalFloat, literalChar, literalString, literalTrue, literalFalse
+                literalFloat, literalInt, literalChar, literalString, literalTrue, literalFalse
         };
 
         int type = -1;
@@ -74,8 +83,8 @@ public class TokenPostProcesser {
         }
 
         return switch (type) {
-            case 0 -> TokenType.LITERAL_INT;
-            case 1 -> TokenType.LITERAL_FLOAT;
+            case 1 -> TokenType.LITERAL_INT;
+            case 0 -> TokenType.LITERAL_FLOAT;
             case 2 -> TokenType.LITERAL_CHAR;
             case 3 -> TokenType.LITERAL_STRING;
             case 4 -> TokenType.LITERAL_TRUE;

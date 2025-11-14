@@ -4,8 +4,8 @@ import com.gabrieljamesbenedict.Exceptions.CompileException;
 import com.gabrieljamesbenedict.LexicalAnalysis.Token;
 import com.gabrieljamesbenedict.LexicalAnalysis.TokenCategory;
 import com.gabrieljamesbenedict.LexicalAnalysis.TokenType;
-import com.gabrieljamesbenedict.SyntaxAnalysis.node.*;
 
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 public class SyntaxAnalyzer {
@@ -20,27 +20,22 @@ public class SyntaxAnalyzer {
         programToken.setType(TokenType.PROGRAM);
         programToken.setCategory(TokenCategory.PROGRAM);
         programToken.setLexeme("Program");
-        Node programNode = addNode(NodeType.PROGRAM, programToken, null);
+        Node programNode = addNode(NodeType.PROGRAM, "Program", null);
         AST.setRoot(programNode);
-
-
 
         parseProgram(it, programNode);
 
         return AST;
     }
 
-    private static Node addNode(NodeType type, Token token, Node parent) {
+    private static Node addNode(NodeType type, String text, Node parent) {
         Node node = new Node();
         node.setType(type);
-        node.setToken(token);
-        node.setParent(parent);
-
-        if (parent != null)
-            parent.addChild(node);
-
+        node.setText(text);
+        if (parent != null) parent.addChild(node);
         return node;
     }
+
 
     private static void parseProgram(TokenIterator it, Node parent) throws CompileException {
         while (!it.eof()) {
@@ -48,70 +43,123 @@ public class SyntaxAnalyzer {
         }
     }
 
+
     private static Node parseStatement(TokenIterator it, Node parent) throws CompileException {
 
-        Token current = it.peek();
+        if (it.match(TokenType.EOF)) {
+            return addNode(NodeType.EOF, null, parent);
+        }
 
         // Empty statement
         if (it.match(TokenType.DELIMITER_SEMICOLON)) {
-            return addNode(NodeType.EMPTY_STATEMENT, current, parent);
+            return addNode(NodeType.EMPTY_STATEMENT, null, parent);
         }
 
         // Block statement
-        if (it.match(TokenType.DELIMITER_LBRACKET)) {
+        if (it.match(TokenType.DELIMITER_LBRACE)) {
+            System.out.println("Parsing Block Statement");
             return parseBlockStatement(it, parent);
         }
 
         // Everything else is a single statement
+        System.out.println("Parsing Single Statement");
         return parseSingleStatement(it, parent);
     }
 
+
     private static Node parseBlockStatement(TokenIterator it, Node parent) throws CompileException {
-
         Node block = addNode(NodeType.BLOCK_STATEMENT, null, parent);
-
-        while (!it.eof() && !it.match(TokenType.DELIMITER_RBRACKET)) {
+        while (!it.eof() && it.peek().getType() != TokenType.DELIMITER_RBRACE) {
             parseStatement(it, block);
         }
-
+        it.expect(TokenType.DELIMITER_RBRACE);
+        System.out.println("Done BLock");
         return block;
     }
+
+    private static boolean doLogging = true;
 
     private static Node parseSingleStatement(TokenIterator it, Node parent) throws CompileException {
 
         Token current = it.peek();
         Token ahead = it.lookahead(1);
 
-        // Declaration: IDENTIFIER AS ...
-        if (current.getCategory() == TokenCategory.IDENTIFIER &&
-                ahead.getType() == TokenType.KEYWORD_AS) {
-            return parseDeclaration(it, parent);
+        Node stmt;
+
+        // Declarations
+        if (current.getCategory() == TokenCategory.IDENTIFIER && ahead.getType() == TokenType.KEYWORD_AS) {
+            if (doLogging) System.out.println("Parsing Declaration");
+            stmt = parseDeclaration(it, parent);
+            return stmt;
         }
 
-        // if / else if / else
-        if (it.match(TokenType.KEYWORD_IF)) {
-            return parseConditional(it, parent, true);
+        // Conditional
+        else if (it.match(TokenType.KEYWORD_IF)) {
+            if (doLogging) System.out.println("Parsing Conditional");
+            stmt = parseConditional(it, parent);
+            return stmt;
         }
 
-        if (it.match(TokenType.KEYWORD_SWITCH)) {
-            return parseSwitch(it, parent);
+        // Switch
+        else if (it.match(TokenType.KEYWORD_SWITCH)) {
+            if (doLogging) System.out.println("Parsing Switch");
+            stmt = parseSwitch(it, parent);
+            return stmt;
         }
 
         // Loops
-        if (isLoopKeyword(current.getType())) {
-            return parseLoop(it, parent);
+        else if (isLoopKeyword(current.getType())) {
+            if (doLogging) System.out.println("Parsing Loop");
+            stmt = parseLoop(it, parent);
+            return stmt;
+        }
+
+        // Return
+        else if (it.match(TokenType.KEYWORD_RETURN)) {
+            if (doLogging) System.out.println("Parsing Return Statement");
+            stmt = addNode(NodeType.RETURN_STATEMENT, it.previous().getLexeme(), parent);
+            if (it.peek().getType() == TokenType.DELIMITER_SEMICOLON)
+                addNode(NodeType.NO_RETURN, null, stmt);
+            else
+                stmt.addChild(parseExpression(it));
+            return stmt;
+        }
+
+        // EOF
+        else if (it.match(TokenType.EOF)) {
+            if (doLogging) System.out.println("Parsing EOF");
+            stmt = addNode(NodeType.EOF, "EOF", parent);
+            return stmt;
         }
 
         // Expression
-        if (canStartExpression(current)) {
-            return parseExpression(it, parent);
+        else if (isExpression(current)) {
+            if (doLogging) System.out.println("Parsing Expression");
+            stmt = parseExpression(it);
+            return stmt;
         }
 
-        if (it.match(TokenType.EOF)) {
-            return addNode(NodeType.EOF, current, parent);
-        }
 
-        throw new CompileException("Unexpected token: " + current.getLexeme());
+        throw new CompileException("Syntax Error: Unexpected statement " + current.getLexeme());
+    }
+
+    private static boolean isExpression(Token tok) {
+        if (tok == null) return false;
+
+        return switch (tok.getType()) {
+            // Literals
+            case LITERAL_INT, LITERAL_FLOAT, LITERAL_STRING, LITERAL_CHAR, LITERAL_TRUE, LITERAL_FALSE -> true;
+
+            // Identifiers can start variables or function calls
+            case IDENTIFIER -> true;
+
+            // Parentheses start grouped expressions
+            case DELIMITER_LPARENTH -> true;
+
+            // Unary operators
+            case OPERATOR_PLUS, OPERATOR_MINUS, OPERATOR_NOT -> true;
+            default -> false;
+        };
     }
 
 
@@ -120,86 +168,172 @@ public class SyntaxAnalyzer {
     // ---------------------------------------------------------------------------
 
     private static Node parseDeclaration(TokenIterator it, Node parent) throws CompileException {
+        Node decl = addNode(null, null, parent);
+        Token token;
 
-        Node decl = addNode(NodeType.VARIABLE_DECLARATION, null, parent);
-
-        Token identifier = it.expect(TokenType.IDENTIFIER);
-        addNode(NodeType.VARIABLE_IDENTIFIER, identifier, decl);
+        token = it.expect(TokenType.IDENTIFIER);
+        Node identifier = addNode(null, token.getLexeme(), decl);
 
         it.expect(TokenType.KEYWORD_AS);
 
-        Token type = it.expect(
-                TokenType.TYPE_INT,
-                TokenType.TYPE_FLOAT,
-                TokenType.TYPE_CHAR,
-                TokenType.TYPE_STRING,
-                TokenType.TYPE_BOOLEAN
-        );
-
-        addNode(NodeType.VARIABLE_TYPE, type, decl);
-
-        // Optional assignment
-        if (it.match(TokenType.OPERATOR_ASSIGN)) {
-            parseExpression(it, decl);
+        token = it.peek();
+        if (token.getType() == TokenType.KEYWORD_ARRAY) {
+            identifier.setType(NodeType.ARRAY_NAME);
+            decl.setType(NodeType.ARRAY_DECLARATION);
+            it.next();
+        } else if (token.getType() == TokenType.KEYWORD_FUNCTION) {
+            identifier.setType(NodeType.FUNCTION_NAME);
+            decl.setType(NodeType.FUNCTION_DECLARATION);
+            it.next();
+        } else if (token.getType() == TokenType.TYPE_INT || token.getType() == TokenType.TYPE_FLOAT
+                || token.getType() == TokenType.TYPE_CHAR || token.getType() == TokenType.TYPE_STRING
+                || token.getType() == TokenType.TYPE_BOOLEAN) {
+            identifier.setType(NodeType.VARIABLE_NAME);
+            decl.setType(NodeType.VARIABLE_DECLARATION);
+        } else {
+            throw new CompileException("Syntax Error: Expected array, function, or type, found " + token.getLexeme());
         }
 
+        if (decl.getType() == NodeType.ARRAY_DECLARATION) {
+
+            it.expect(TokenType.KEYWORD_OF);
+
+            if (it.peek().getCategory() != TokenCategory.TYPE) {
+                Node arrSize = addNode(NodeType.ARRAY_SIZE, null, null);
+                arrSize.addChild(parseExpression(it));
+                decl.addChild(arrSize);
+            }
+
+            Token t1 = it.expect(TokenType.TYPE_INT, TokenType.TYPE_FLOAT, TokenType.TYPE_STRING, TokenType.TYPE_CHAR, TokenType.TYPE_BOOLEAN);
+            Node elType = addNode(NodeType.ARRAY_ELEMENT_TYPE, t1.getLexeme(), decl);
+
+            if (it.match(TokenType.OPERATOR_ASSIGN)) {
+                Node arrBody = addNode(NodeType.ARRAY_BODY, null, decl);
+                Token t = it.peek();
+                if (it.match(TokenType.DELIMITER_LBRACKET)) {
+                    Node arrEls = parseLiteralArray(it);
+                    arrBody.addChild(arrEls);
+                } else if (it.match(TokenType.IDENTIFIER)) {
+                    Node arrEls = addNode(NodeType.ARRAY_NAME, t.getLexeme(), null);
+                    arrBody.addChild(arrEls);
+                } else {
+                    throw new CompileException("Syntax Error: Expected Array Literal or Identifier");
+                }
+            }
+        }
+
+        if (decl.getType() == NodeType.FUNCTION_DECLARATION) {
+
+            System.out.println("Check Parameter");
+            boolean hasParam = it.match(TokenType.KEYWORD_ACCEPTS);
+            if (hasParam) {
+                it.expect(TokenType.DELIMITER_LPARENTH);
+                Node params = addNode(NodeType.FUNCTION_PARAMETERS, null, decl);
+                while (!it.eof() && it.peek().getType() != TokenType.DELIMITER_RPARENTH) {
+                    Token t1 = it.expect(TokenType.IDENTIFIER);
+                    it.expect(TokenType.KEYWORD_AS);
+                    Token t2 = it.next();
+                    if (t2.getCategory() != TokenCategory.TYPE) throw new CompileException("Syntax Error: Expected type in parameter declaration");
+                    it.match(TokenType.DELIMITER_COMMA);
+                    Node param = addNode(NodeType.FUNCTION_PARAMETER, null, params);
+                    addNode(NodeType.FUNCTION_PARAMETER_NAME, t1.getLexeme(), param);
+                    addNode(NodeType.FUNCTION_PARAMETER_TYPE, t2.getLexeme(), param);
+                }
+                it.expect(TokenType.DELIMITER_RPARENTH);
+            }
+
+            System.out.println("Check Return Type");
+            boolean hasReturn = it.match(TokenType.KEYWORD_RETURNS);
+            if (hasReturn) {
+                Token t2 = it.next();
+                if (t2.getCategory() != TokenCategory.TYPE) throw new CompileException("Syntax Error: Expected type in return type declaration");
+                Node t1 = addNode(NodeType.FUNCTION_RETURN_TYPE, null, decl);
+                NodeType type = switch (t2.getType()) {
+                    case TYPE_INT -> NodeType.TYPE_INT;
+                    case TYPE_FLOAT -> NodeType.TYPE_FLOAT;
+                    case TYPE_CHAR -> NodeType.TYPE_CHAR;
+                    case TYPE_STRING -> NodeType.TYPE_STRING;
+                    case TYPE_BOOLEAN -> NodeType.TYPE_BOOLEAN;
+                    default -> throw new CompileException("Syntax Error: Expected type on function return type");
+                };
+                addNode(type, t2.getLexeme(), t1);
+            }
+
+            System.out.println("Check function body");
+            parseStatement(it, addNode(NodeType.FUNCTION_BODY, null, decl));
+
+        }
+
+        if (decl.getType() == NodeType.VARIABLE_DECLARATION) {
+            Node varType;
+            Token t1 = it.expect(TokenType.TYPE_INT
+                    , TokenType.TYPE_FLOAT
+                    , TokenType.TYPE_CHAR, TokenType.TYPE_STRING
+                    , TokenType.TYPE_BOOLEAN);
+            varType = addNode(NodeType.VARIABLE_TYPE, t1.getLexeme(), decl);
+
+            if (it.match(TokenType.OPERATOR_ASSIGN)) {
+                Node varVal = addNode(NodeType.VARIABLE_BODY, null, decl);
+                varVal.addChild(parseExpression(it));
+            }
+        }
+
+        System.out.println("Done Declaration");
         return decl;
     }
-
 
     // ---------------------------------------------------------------------------
     // CONDITIONALS
     // ---------------------------------------------------------------------------
 
-    private static Node parseConditional(TokenIterator it, Node parent, boolean isIf) throws CompileException {
+    private static Node parseConditional(TokenIterator it, Node parent) throws CompileException {
+        Token token = it.expect(TokenType.KEYWORD_IF);
 
-        Node cond = addNode(NodeType.CONDITIONAL, null, parent);
+        Node cond = addNode(NodeType.CONDITIONAL, "CONDITIONAL", parent);
 
-        if (isIf) {
-            Node ifNode = addNode(NodeType.IF, it.peek(), cond);
+        Node ifNode = addNode(NodeType.IF, "IF", cond);
+        it.expect(TokenType.DELIMITER_LPARENTH);
+        Node ifCondition = parseExpression(it);
+        it.expect(TokenType.DELIMITER_RPARENTH);
+        Node ifBody = parseStatement(it, cond);
+        ifNode.addAllChildren(ifCondition, ifBody);
 
+        // else-if chain
+        while (it.match(TokenType.KEYWORD_ELSE) && it.match(TokenType.KEYWORD_IF)) {
+            Node elifNode = addNode(NodeType.ELSE_IF, "ELSE-IF", cond);
             it.expect(TokenType.DELIMITER_LPARENTH);
-            parseExpression(it, ifNode);
+            Node elifCondition = parseExpression(it);
             it.expect(TokenType.DELIMITER_RPARENTH);
+            Node elifBody = parseStatement(it, elifNode);
+            elifNode.addAllChildren(elifCondition, elifBody);
+        }
 
-            parseStatement(it, ifNode);
-
-            // else-if chain
-            while (it.match(TokenType.KEYWORD_ELSE) && it.match(TokenType.KEYWORD_IF)) {
-                Node elif = addNode(NodeType.ELSE_IF, it.peek(), cond);
-                it.expect(TokenType.DELIMITER_LPARENTH);
-                parseExpression(it, elif);
-                it.expect(TokenType.DELIMITER_RPARENTH);
-                parseStatement(it, elif);
-            }
-
-            // else block
-            if (it.match(TokenType.KEYWORD_ELSE)) {
-                Node elseNode = addNode(NodeType.ELSE, it.peek(), cond);
-                parseStatement(it, elseNode);
-            }
+        // else block
+        if (it.match(TokenType.KEYWORD_ELSE)) {
+            Node elseNode = addNode(NodeType.ELSE_IF, "ELSE", cond);
+            it.expect(TokenType.DELIMITER_RPARENTH);
+            Node elseBody = parseStatement(it, elseNode);
         }
 
         return cond;
     }
-
 
     // ---------------------------------------------------------------------------
     // SWITCH
     // ---------------------------------------------------------------------------
 
     private static Node parseSwitch(TokenIterator it, Node parent) throws CompileException {
-
-        Node switchNode = addNode(NodeType.SWITCH, it.peek(), parent);
+        Token token = it.expect(TokenType.KEYWORD_SWITCH);
+        Node switchNode = addNode(NodeType.SWITCH, token.getLexeme(), parent);
 
         it.expect(TokenType.DELIMITER_LPARENTH);
-        parseExpression(it, switchNode);
+        Node switchExpr = parseExpression(it);
         it.expect(TokenType.DELIMITER_RPARENTH);
 
         it.expect(TokenType.DELIMITER_LBRACKET);
 
         while (!it.eof() && !it.match(TokenType.DELIMITER_RBRACKET)) {
-            parseCase(it, switchNode);
+            Node caseNode = parseCase(it, switchNode);
         }
 
         return switchNode;
@@ -210,18 +344,18 @@ public class SyntaxAnalyzer {
         Node caseNode;
 
         if (it.match(TokenType.KEYWORD_CASE)) {
-            caseNode = addNode(NodeType.CASE, it.peek(), parent);
+            caseNode = addNode(NodeType.CASE, "CASE", parent);
             it.expect(TokenType.DELIMITER_LPARENTH);
-            parseExpression(it, caseNode);
+            Node caseExpr = parseExpression(it);
             it.expect(TokenType.DELIMITER_RPARENTH);
         } else if (it.match(TokenType.KEYWORD_DEFAULT)) {
-            caseNode = addNode(NodeType.DEFAULT, it.peek(), parent);
+            caseNode = addNode(NodeType.DEFAULT, "DEFAULT", parent);
         } else {
-            throw new CompileException("Invalid case in switch");
+            throw new CompileException("Syntax Error: Invalid case in switch");
         }
 
         it.expect(TokenType.DELIMITER_COLON);
-        parseStatement(it, caseNode);
+        Node caseBody = parseStatement(it, caseNode);
 
         return caseNode;
     }
@@ -237,87 +371,107 @@ public class SyntaxAnalyzer {
 
         if (keyword.getType() == TokenType.KEYWORD_WHILE) {
             it.next();
-            Node loop = addNode(NodeType.WHILE_LOOP, keyword, parent);
+            Node loop = addNode(NodeType.WHILE_LOOP, "WHILE", parent);
             it.expect(TokenType.DELIMITER_LPARENTH);
-            parseExpression(it, loop);
+            Node loopExpr = parseExpression(it);
             it.expect(TokenType.DELIMITER_RPARENTH);
-            parseStatement(it, loop);
+            Node loopBody = parseStatement(it, loop);
+
+            loop.addAllChildren(loopExpr, loopBody);
             return loop;
         }
 
         if (keyword.getType() == TokenType.KEYWORD_UNTIL) {
             it.next();
-            Node loop = addNode(NodeType.UNTIL_LOOP, keyword, parent);
+            Node loop = addNode(NodeType.UNTIL_LOOP, "UNTIL", parent);
             it.expect(TokenType.DELIMITER_LPARENTH);
-            parseExpression(it, loop);
+            Node loopExpr = parseExpression(it);
             it.expect(TokenType.DELIMITER_RPARENTH);
-            parseStatement(it, loop);
+            Node loopBody = parseStatement(it, loop);
+
+            loop.addAllChildren(loopExpr, loopBody);
             return loop;
         }
 
         if (keyword.getType() == TokenType.KEYWORD_DO) {
             it.next();
-            Node loop = addNode(null, keyword, parent);
+            Node loop = addNode(null, "DO", parent);
 
-            parseStatement(it, loop);
+            Node loopBody = parseStatement(it, loop);
 
             if (it.match(TokenType.KEYWORD_WHILE)) {
                 loop.setType(NodeType.DO_WHILE_LOOP);
+                loop.setText("DO-WHILE");
             } else if (it.match(TokenType.KEYWORD_UNTIL)) {
                 loop.setType(NodeType.DO_UNTIL_LOOP);
+                loop.setText("DO-UNTIL");
             } else {
-                throw new CompileException("Expected WHILE or UNTIL after DO");
+                throw new CompileException("Syntax Error: Expected WHILE or UNTIL after DO");
             }
 
             it.expect(TokenType.DELIMITER_LPARENTH);
-            parseExpression(it, loop);
+            Node loopExpr = parseExpression(it);
             it.expect(TokenType.DELIMITER_RPARENTH);
 
+            loop.addAllChildren(loopExpr, loopBody);
             return loop;
         }
 
         if (keyword.getType() == TokenType.KEYWORD_FOR) {
             it.next();
-            Node loop = addNode(NodeType.FOR_LOOP, keyword, parent);
+            Node loop = addNode(NodeType.FOR_LOOP, "FOR", parent);
 
             it.expect(TokenType.DELIMITER_LPARENTH);
             it.expect(TokenType.KEYWORD_EACH);
 
             Token var = it.expect(TokenType.IDENTIFIER);
-            addNode(NodeType.VARIABLE_IDENTIFIER, var, loop);
+            Node loopVar = addNode(NodeType.VARIABLE_NAME, var.getLexeme(), loop);
 
             it.expect(TokenType.KEYWORD_IN);
 
-            Token arr = it.expect(TokenType.IDENTIFIER);
-            addNode(NodeType.ARRAY_IDENTIFIER, arr, loop);
+            Token arr = it.peek();
+            Node loopArr;
+            if (it.match(TokenType.IDENTIFIER)) {
+                loopArr = addNode(NodeType.ARRAY_NAME, arr.getLexeme(), loop);
+                ;
+            } else if (it.match(TokenType.DELIMITER_LBRACE)) {
+                loopArr = parseLiteralArray(it);
+                loop.addChild(loopArr);
+            } else {
+                throw new CompileException("Syntax Error: Unexpected symbol in array declaration " + it.peek().getLexeme());
+            }
 
             it.expect(TokenType.DELIMITER_RPARENTH);
+            Node loopBody = parseStatement(it, loop);
+            it.expect(TokenType.DELIMITER_LPARENTH);
 
-            parseStatement(it, loop);
+            loop.addAllChildren(loopVar, loopArr, loopBody);
 
             return loop;
         }
 
         if (keyword.getType() == TokenType.KEYWORD_REPEAT) {
             it.next();
-            Node loop = addNode(NodeType.REPEAT_LOOP, keyword, parent);
+            Node loop = addNode(NodeType.REPEAT_LOOP, "REPEAT", parent);
 
             it.expect(TokenType.DELIMITER_LPARENTH);
             Token count = it.expect(TokenType.LITERAL_INT, TokenType.IDENTIFIER);
-            addNode(NodeType.REPEAT_AMOUNT, count, loop);
+            Node loopAm = addNode(NodeType.REPEAT_AMOUNT, count.getLexeme(), loop);
             it.expect(TokenType.DELIMITER_RPARENTH);
 
             if (it.match(TokenType.KEYWORD_WITH)) {
                 Token var = it.expect(TokenType.IDENTIFIER);
-                addNode(NodeType.VARIABLE_IDENTIFIER, var, loop);
-
+                Node arrVar = addNode(NodeType.VARIABLE_NAME, var.getLexeme(), loop);
                 it.expect(TokenType.KEYWORD_AS);
-                it.expect(TokenType.TYPE_INT, TokenType.TYPE_FLOAT,
-                        TokenType.TYPE_CHAR, TokenType.TYPE_STRING,
+                Token token = it.expect(TokenType.TYPE_INT,
+                        TokenType.TYPE_FLOAT,
+                        TokenType.TYPE_CHAR,
+                        TokenType.TYPE_STRING,
                         TokenType.TYPE_BOOLEAN);
+                Node arrVarType = addNode(NodeType.VARIABLE_TYPE, token.getLexeme(), arrVar);
             }
 
-            parseStatement(it, loop);
+            Node loopBody = parseStatement(it, loop);
 
             return loop;
         }
@@ -334,186 +488,375 @@ public class SyntaxAnalyzer {
                 ;
     }
 
+    private static Node parseLiteralArray(TokenIterator it) throws CompileException {
+        Node loopArr = addNode(NodeType.LITERAL_ARRAY, "ARRAY", null);
+        while (it.peek().getType() != TokenType.DELIMITER_RBRACKET) {
+            Token token = it.next();
+            Node arrEl = addNode(NodeType.ARRAY_ELEMENT, token.getLexeme(), loopArr);
+            if (it.match(TokenType.DELIMITER_COMMA)) {
+                // Do nothing
+            } else if (it.match(TokenType.DELIMITER_RBRACKET)) {
+                break;
+            } else {
+                throw new CompileException("Syntax Error: Unexpected symbol in array literal " + it.peek().getLexeme());
+            }
+        }
+        return loopArr;
+    }
+
+
     // ---------------------------------------------------------------------------
     // EXPRESSION PARSER
     // ---------------------------------------------------------------------------
 
-    // Entry point
-    private static Node parseExpression(TokenIterator it, Node parent) throws CompileException {
-        Token tok = it.peek();
-        if (tok == null || !canStartExpression(tok)) return null;
-        return parseLogicalOr(it, parent);
-    }
+    // This is the most confusing thing ever
 
-    // Checks if a token can start an expression
-    private static boolean canStartExpression(Token tok) {
-        switch (tok.getType()) {
-            case LITERAL_INT, LITERAL_FLOAT, LITERAL_STRING, LITERAL_CHAR,
-                 LITERAL_TRUE, LITERAL_FALSE, IDENTIFIER,
-                 DELIMITER_LPARENTH, OPERATOR_PLUS, OPERATOR_MINUS, OPERATOR_NOT:
-                return true;
-            default:
-                return false;
+    /*
+        Assignment
+        Logical OR
+        Logical XOR
+        Logical AND
+        Equality
+        Comparison
+        Addition
+        Multiplication
+        Unary
+        Atomic
+     */
+
+    // ---------------------------------------------------------------------------
+    // EXPRESSION PARSER
+    // ---------------------------------------------------------------------------
+
+    // Entry point for expressions
+    private static Node parseExpression(TokenIterator it) throws CompileException {
+        ArrayList<Token> tokens = new ArrayList<>();
+
+        while (true) {
+            Token token = it.next();
+            tokens.add(token);
+            System.out.println("Adding to stream: " + token.getLexeme());
+            Token next = it.peek();
+            if (next == null) break;
+            if (
+                    next.getCategory() == TokenCategory.KEYWORD
+                    || next.getCategory() == TokenCategory.TYPE
+                    || (next.getCategory() == TokenCategory.DELIMITER
+                    && next.getType() != TokenType.DELIMITER_LPARENTH
+                    && next.getType() != TokenType.DELIMITER_RPARENTH)) {
+                break;
+            }
+
         }
+
+        TokenIterator expressionStream = new TokenIterator(tokens.stream());
+        Node expressionNode = parseAssignment(expressionStream);
+        System.out.println("All Done");
+        return expressionNode;
     }
 
-    // Logical OR (||)
-    private static Node parseLogicalOr(TokenIterator it, Node parent) throws CompileException {
-        Node left = parseLogicalAnd(it, parent);
+    // Assignment is right-associative
+    private static Node parseAssignment(TokenIterator it) throws CompileException {
+        Node left = parseLogicalOr(it);
         if (left == null) return null;
 
-        while (it.match(TokenType.OPERATOR_OR)) {
-            Token op = it.previous();  // Use previous consumed token from iterator
-            Node node = addNode(NodeType.BINARY_EXPRESSION, op, parent);
-            node.addChild(left);
-            node.addChild(parseLogicalAnd(it, node));
-            left = node;
+        Token op = null;
+        NodeType type = null;
+
+        if (it.match(TokenType.OPERATOR_ASSIGN)) {
+            op = it.previous();
+            type = NodeType.ASSIGNMENT;
+        } else if (it.match(TokenType.OPERATOR_ASSIGNPLUS)) {
+            op = it.previous();
+            type = NodeType.ADDITION_ASSIGNMENT;
+        } else if (it.match(TokenType.OPERATOR_ASSIGNMINUS)) {
+            op = it.previous();
+            type = NodeType.SUBTRACTION_ASSIGNMENT;
+        } else if (it.match(TokenType.OPERATOR_ASSIGNTIMES)) {
+            op = it.previous();
+            type = NodeType.MULTIPLICATION_ASSIGNMENT;
+        } else if (it.match(TokenType.OPERATOR_ASSIGNDIVIDE)) {
+            op = it.previous();
+            type = NodeType.DIVISION_ASSIGNMENT;
+        } else if (it.match(TokenType.OPERATOR_ASSIGNMODULO)) {
+            op = it.previous();
+            type = NodeType.MODULO_ASSIGNMENT;
         }
 
-        return left;
-    }
+        if (type != null) {
+            Node right = parseAssignment(it);
+            if (right == null)
+                throw new CompileException("Expected expression after " + op.getLexeme());
 
-    // Logical AND (&&)
-    private static Node parseLogicalAnd(TokenIterator it, Node parent) throws CompileException {
-        Node left = parseEquality(it, parent);
-        if (left == null) return null;
-
-        while (it.match(TokenType.OPERATOR_AND)) {
-            Token op = it.previous();
-            Node node = addNode(NodeType.BINARY_EXPRESSION, op, parent);
+            Node node = new Node();
+            node.setType(type);
+            node.setText(op.getLexeme());
             node.addChild(left);
-            node.addChild(parseEquality(it, node));
-            left = node;
-        }
-
-        return left;
-    }
-
-    // Equality (==, !=)
-    private static Node parseEquality(TokenIterator it, Node parent) throws CompileException {
-        Node left = parseComparison(it, parent);
-        if (left == null) return null;
-
-        while (it.match(TokenType.OPERATOR_EQUALS) || it.match(TokenType.OPERATOR_NOTEQUALS)) {
-            Token op = it.previous();
-            Node node = addNode(NodeType.BINARY_EXPRESSION, op, parent);
-            node.addChild(left);
-            node.addChild(parseComparison(it, node));
-            left = node;
-        }
-
-        return left;
-    }
-
-    // Comparison (<, <=, >, >=)
-    private static Node parseComparison(TokenIterator it, Node parent) throws CompileException {
-        Node left = parseAddition(it, parent);
-        if (left == null) return null;
-
-        while (it.match(TokenType.OPERATOR_LESSER) || it.match(TokenType.OPERATOR_LESSERQUALS)
-                || it.match(TokenType.OPERATOR_GREATER) || it.match(TokenType.OPERATOR_GREATEREQUALS)) {
-            Token op = it.previous();
-            Node node = addNode(NodeType.BINARY_EXPRESSION, op, parent);
-            node.addChild(left);
-            node.addChild(parseAddition(it, node));
-            left = node;
-        }
-
-        return left;
-    }
-
-    // Addition/Subtraction (+, -)
-    private static Node parseAddition(TokenIterator it, Node parent) throws CompileException {
-        Node left = parseMultiplication(it, parent);
-        if (left == null) return null;
-
-        while (it.match(TokenType.OPERATOR_PLUS) || it.match(TokenType.OPERATOR_MINUS)) {
-            Token op = it.previous();
-            Node node = addNode(NodeType.BINARY_EXPRESSION, op, parent);
-            node.addChild(left);
-            node.addChild(parseMultiplication(it, node));
-            left = node;
-        }
-
-        return left;
-    }
-
-    // Multiplication/Division/Modulo (*, /, %)
-    private static Node parseMultiplication(TokenIterator it, Node parent) throws CompileException {
-        Node left = parseUnary(it, parent);
-        if (left == null) return null;
-
-        while (it.match(TokenType.OPERATOR_TIMES) || it.match(TokenType.OPERATOR_DIVIDE) || it.match(TokenType.OPERATOR_MODULO)) {
-            Token op = it.previous();
-            Node node = addNode(NodeType.BINARY_EXPRESSION, op, parent);
-            node.addChild(left);
-            node.addChild(parseUnary(it, node));
-            left = node;
-        }
-
-        return left;
-    }
-
-    // Unary operators (+, -, !)
-    private static Node parseUnary(TokenIterator it, Node parent) throws CompileException {
-        if (it.match(TokenType.OPERATOR_NOT) || it.match(TokenType.OPERATOR_PLUS) || it.match(TokenType.OPERATOR_MINUS)) {
-            Token op = it.previous();
-            Node node = addNode(NodeType.UNARY_EXPRESSION, op, parent);
-            node.addChild(parseUnary(it, node));
+            node.addChild(right);
             return node;
         }
-        return parsePrimary(it, parent);
+
+        return left;
     }
 
-    // Primary expressions (literals, identifiers, function calls, parentheses)
-    private static Node parsePrimary(TokenIterator it, Node parent) throws CompileException {
-        Token tok = it.peek();
-        if (tok == null) throw new CompileException("Unexpected EOF in expression");
+    // Binary logical operators (OR, XOR, AND) - left-associative
+    private static Node parseLogicalOr(TokenIterator it) throws CompileException {
+        Node left = parseLogicalXor(it);
+        if (left == null) return null;
 
-        Node node;
-        switch (tok.getType()) {
-            case LITERAL_INT, LITERAL_FLOAT, LITERAL_STRING, LITERAL_CHAR, LITERAL_TRUE, LITERAL_FALSE -> {
-                it.next();
-                node = addNode(mapLiteralToNodeType(tok.getType()), tok, parent);
+        while (true) {
+            NodeType type = null;
+            if (it.match(TokenType.OPERATOR_OR)) type = NodeType.OR;
+            else if (it.match(TokenType.OPERATOR_NOR)) type = NodeType.NOR;
+            else break;
+
+            Node right = parseLogicalXor(it);
+            if (right == null) throw new CompileException("Expected expression after logical operator");
+
+            Node node = new Node();
+            node.setType(type);
+            node.addChild(left);
+            node.addChild(right);
+            left = node;
+        }
+
+        return left;
+    }
+
+    private static Node parseLogicalXor(TokenIterator it) throws CompileException {
+        Node left = parseLogicalAnd(it);
+        if (left == null) return null;
+
+        while (true) {
+            NodeType type = null;
+            if (it.match(TokenType.OPERATOR_XOR)) type = NodeType.XOR;
+            else if (it.match(TokenType.OPERATOR_XNOR)) type = NodeType.XNOR;
+            else break;
+
+            Node right = parseLogicalAnd(it);
+            if (right == null) throw new CompileException("Expected expression after logical operator");
+
+            Node node = new Node();
+            node.setType(type);
+            node.addChild(left);
+            node.addChild(right);
+            left = node;
+        }
+
+        return left;
+    }
+
+    private static Node parseLogicalAnd(TokenIterator it) throws CompileException {
+        Node left = parseEquality(it);
+        if (left == null) return null;
+
+        while (true) {
+            NodeType type = null;
+            if (it.match(TokenType.OPERATOR_AND)) type = NodeType.AND;
+            else if (it.match(TokenType.OPERATOR_NAND)) type = NodeType.NAND;
+            else break;
+
+            Node right = parseEquality(it);
+            if (right == null) throw new CompileException("Expected expression after logical operator");
+
+            Node node = new Node();
+            node.setType(type);
+            node.addChild(left);
+            node.addChild(right);
+            left = node;
+        }
+
+        return left;
+    }
+
+    // Equality and comparison
+    private static Node parseEquality(TokenIterator it) throws CompileException {
+        Node left = parseComparison(it);
+        if (left == null) return null;
+
+        while (true) {
+            NodeType type = null;
+            if (it.match(TokenType.OPERATOR_EQUALS)) type = NodeType.EQUALS;
+            else if (it.match(TokenType.OPERATOR_NOTEQUALS)) type = NodeType.NOTEQUALS;
+            else break;
+
+            Node right = parseComparison(it);
+            if (right == null) throw new CompileException("Expected expression after equality operator");
+
+            Node node = new Node();
+            node.setType(type);
+            node.addChild(left);
+            node.addChild(right);
+            left = node;
+        }
+
+        return left;
+    }
+
+    private static Node parseComparison(TokenIterator it) throws CompileException {
+        Node left = parseAddition(it);
+        if (left == null) return null;
+
+        while (true) {
+            NodeType type = null;
+            if (it.match(TokenType.OPERATOR_LESSER)) type = NodeType.LESS;
+            else if (it.match(TokenType.OPERATOR_LESSERQUALS)) type = NodeType.LESSEQUALS;
+            else if (it.match(TokenType.OPERATOR_GREATER)) type = NodeType.GREATER;
+            else if (it.match(TokenType.OPERATOR_GREATEREQUALS)) type = NodeType.GREATEREQUALS;
+            else break;
+
+            Node right = parseAddition(it);
+            if (right == null) throw new CompileException("Expected expression after comparison operator");
+
+            Node node = new Node();
+            node.setType(type);
+            node.addChild(left);
+            node.addChild(right);
+            left = node;
+        }
+
+        return left;
+    }
+
+    // Addition/Subtraction
+    private static Node parseAddition(TokenIterator it) throws CompileException {
+        Node left = parseMultiplication(it);
+        if (left == null) return null;
+
+        while (true) {
+            NodeType type = null;
+            if (it.match(TokenType.OPERATOR_PLUS)) type = NodeType.ADDITION;
+            else if (it.match(TokenType.OPERATOR_MINUS)) type = NodeType.SUBTRACTION;
+            else break;
+
+            Node right = parseMultiplication(it);
+            if (right == null) throw new CompileException("Expected expression after + or -");
+
+            Node node = new Node();
+            node.setType(type);
+            node.addChild(left);
+            node.addChild(right);
+            left = node;
+        }
+
+        return left;
+    }
+
+    // Multiplication/Division/Modulo
+    private static Node parseMultiplication(TokenIterator it) throws CompileException {
+        Node left = parseUnary(it);
+        if (left == null) return null;
+
+        while (true) {
+            NodeType type = null;
+            if (it.match(TokenType.OPERATOR_TIMES)) type = NodeType.MULTIPLICATION;
+            else if (it.match(TokenType.OPERATOR_DIVIDE)) type = NodeType.DIVISION;
+            else if (it.match(TokenType.OPERATOR_MODULO)) type = NodeType.MODULO;
+            else break;
+
+            Node right = parseUnary(it);
+            if (right == null) throw new CompileException("Expected expression after *, /, or %");
+
+            Node node = new Node();
+            node.setType(type);
+            node.addChild(left);
+            node.addChild(right);
+            left = node;
+        }
+
+        return left;
+    }
+
+    // Unary operators
+    private static Node parseUnary(TokenIterator it) throws CompileException {
+        if (it.match(TokenType.OPERATOR_NEGATIVE)) {
+            Node node = new Node();
+            node.setType(NodeType.NEGATIVE);
+            node.setText("-");
+            Node child = parseUnary(it);
+            if (child == null) throw new CompileException("Expected expression after -");
+            node.addChild(child);
+            return node;
+        } else if (it.match(TokenType.OPERATOR_NOT)) {
+            Node node = new Node();
+            node.setType(NodeType.NOT);
+            node.setText("!");
+            Node child = parseUnary(it);
+            if (child == null) throw new CompileException("Expected expression after !");
+            node.addChild(child);
+            return node;
+        } else {
+            System.out.println("Going atomic.");
+            return parseAtomic(it);
+        }
+    }
+
+
+    // Atomic literals, identifiers, parentheses, arrays, function calls
+    private static Node parseAtomic(TokenIterator it) throws CompileException {
+        Token token = it.peek();
+        if (token == null) return null;
+
+        Node node = new Node();
+
+        // Literals
+        if (it.match(TokenType.LITERAL_INT)) {
+            node.setType(NodeType.LITERAL_INT);
+        } else if (it.match(TokenType.LITERAL_FLOAT)) {
+            node.setType(NodeType.LITERAL_FLOAT);
+        } else if (it.match(TokenType.LITERAL_CHAR)) {
+            node.setType(NodeType.LITERAL_CHAR);
+        } else if (it.match(TokenType.LITERAL_STRING)) {
+            node.setType(NodeType.LITERAL_STRING);
+        } else if (it.match(TokenType.LITERAL_TRUE)) {
+            node.setType(NodeType.LITERAL_TRUE);
+        } else if (it.match(TokenType.LITERAL_FALSE)) {
+            node.setType(NodeType.LITERAL_FALSE);
+        }
+
+        // Identifiers (variables, arrays, function calls)
+        else if (it.match(TokenType.IDENTIFIER)) {
+            node.setType(NodeType.VARIABLE_TYPE);
+
+            // Array access
+            if (it.match(TokenType.DELIMITER_LBRACE)) {
+                Node index = parseExpression(it);
+                node.addChild(index);
+                node.setType(NodeType.ARRAY_NAME);
             }
+            // Function call
+            else if (it.match(TokenType.DELIMITER_LPARENTH)) {
+                Node args = new Node();
+                args.setType(NodeType.FUNCTION_ARGUMENTS);
+                args.setText("ARGUMENTS");
 
-            case IDENTIFIER -> {
-                it.next();
-                node = addNode(NodeType.IDENTIFIER, tok, parent);
-
-                if (it.match(TokenType.DELIMITER_LPARENTH)) {
-                    Node callNode = addNode(NodeType.FUNCTION_EXPRESSION, tok, parent);
-                    callNode.addChild(node);
-                    while (!it.eof() && !it.match(TokenType.DELIMITER_RPARENTH)) {
-                        Node arg = parseExpression(it, callNode);
-                        if (arg != null) callNode.addChild(arg);
-                        it.match(TokenType.DELIMITER_COMMA); // optional
-                    }
-                    node = callNode;
+                while (!it.eof() && it.peek().getType() != TokenType.DELIMITER_RPARENTH) {
+                    Node arg = parseExpression(it);
+                    args.addChild(arg);
+                    it.match(TokenType.DELIMITER_COMMA);
                 }
-            }
 
-            case DELIMITER_LPARENTH -> {
-                it.next();
-                node = parseExpression(it, parent);
-                it.expect(TokenType.DELIMITER_RPARENTH);
+                node.addChild(args);
+                node.setType(NodeType.FUNCTION_NAME);
             }
+        }
 
-            default -> throw new CompileException("Unexpected token in expression: " + tok.getLexeme());
+        // Parenthesized expressions
+        else if (it.match(TokenType.DELIMITER_LPARENTH)) {
+            Node expr = parseExpression(it);
+            //it.expect(TokenType.DELIMITER_RPARENTH);
+            return expr;
+        }
+
+        else {
+            throw new CompileException("Unexpected token " + token.getLexeme());
         }
 
         return node;
     }
 
-    private static NodeType mapLiteralToNodeType(TokenType type) {
-        return switch (type) {
-            case LITERAL_INT -> NodeType.LITERAL_INT;
-            case LITERAL_FLOAT -> NodeType.LITERAL_FLOAT;
-            case LITERAL_STRING -> NodeType.LITERAL_STRING;
-            case LITERAL_CHAR -> NodeType.LITERAL_CHAR;
-            case LITERAL_TRUE -> NodeType.LITERAL_TRUE;
-            case LITERAL_FALSE -> NodeType.LITERAL_FALSE;
-            default -> null;
-        };
-    }
+
+
+
+
 }

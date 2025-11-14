@@ -1,25 +1,26 @@
-package com.gabrieljamesbenedict.SyntaxAnalysis.node;
+package com.gabrieljamesbenedict.SyntaxAnalysis;
 
-import com.gabrieljamesbenedict.LexicalAnalysis.Token;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Data
 public class Node {
 
     NodeType type;
-    Token token;
+    String text;
 
     Node parent;
     ArrayList<Node> children = new ArrayList<>();
 
     public void addChild(Node node) {
+        node.setParent(this);
         children.add(node);
     }
-    public void addAllChildren(Node... node) {
-        children.addAll(List.of(node));
+    public void addAllChildren(Node... nodes) {
+        for (Node node : nodes) {
+            addChild(node);
+        }
     }
 
 }

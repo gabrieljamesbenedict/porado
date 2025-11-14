@@ -1,4 +1,4 @@
-package com.gabrieljamesbenedict.SyntaxAnalysis.node;
+package com.gabrieljamesbenedict.SyntaxAnalysis;
 
 public enum NodeType {
     PROGRAM,
@@ -7,12 +7,38 @@ public enum NodeType {
     BLOCK_STATEMENT,
 
     VARIABLE_DECLARATION,
+    ARRAY_DECLARATION,
+    FUNCTION_DECLARATION,
 
+    // Implement this in the future
+    FIXED_MODIFIER,
+    STRICT_MODIFIER,
+
+    VARIABLE_NAME,
     VARIABLE_TYPE,
+    VARIABLE_BODY,
 
-    IDENTIFIER,
-    VARIABLE_IDENTIFIER,
-    ARRAY_IDENTIFIER,
+    ARRAY_NAME,
+    ARRAY_SIZE,
+    ARRAY_ELEMENT,
+    ARRAY_ELEMENT_TYPE,
+    ARRAY_BODY,
+
+    FUNCTION_NAME,
+    FUNCTION_PARAMETERS,
+    FUNCTION_PARAMETER,
+    FUNCTION_PARAMETER_NAME,
+    FUNCTION_PARAMETER_TYPE,
+    FUNCTION_RETURN_TYPE,
+    FUNCTION_BODY,
+    FUNCTION_ARGUMENTS,
+    FUNCTION_ARGUMENT,
+    FUNCTION_ARGUMENT_NAME,
+    FUNCTION_ARGUMENT_TYPE,
+
+    RETURN_STATEMENT,
+    NO_RETURN,
+
 
     CONDITIONAL,
     IF,
@@ -29,13 +55,7 @@ public enum NodeType {
     DO_UNTIL_LOOP,
     FOR_LOOP,
     REPEAT_LOOP,
-
     REPEAT_AMOUNT,
-
-    BINARY_EXPRESSION,
-    UNARY_EXPRESSION,
-
-    FUNCTION_EXPRESSION,
 
     ADDITION,
     SUBTRACTION,
@@ -54,6 +74,21 @@ public enum NodeType {
     MULTIPLICATION_ASSIGNMENT,
     DIVISION_ASSIGNMENT,
     MODULO_ASSIGNMENT,
+
+    NOT,
+    OR,
+    NOR,
+    XOR,
+    XNOR,
+    AND,
+    NAND,
+    EQUALS,
+    NOTEQUALS,
+    LESS,
+    LESSEQUALS,
+    GREATER,
+    GREATEREQUALS,
+
 
     TYPE_INT,
     TYPE_FLOAT,

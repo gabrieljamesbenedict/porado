@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class TokenIterator {
 
     private final Deque<Token> tokens;
-
+    private boolean doLogging = true;
     Token lastConsumed = null;
 
     TokenIterator(Stream<Token> tokenStream) {
@@ -22,40 +22,55 @@ public class TokenIterator {
 
     Token peek() {
         Token token = tokens.peekFirst();
-//        if (token != null)
-//            System.out.println("Peeked Token: " + token.getLexeme());
-//        else
-//            System.out.println("Peeked Token: EOF");
+        if (doLogging && token != null) {
+            System.out.println("Peek: " + token.getLexeme());
+        }
         return token;
     }
 
     public Token lookahead(int n) {
         Token token = tokens.stream().skip(n).findFirst().orElse(null);
-        //if (token != null) System.out.println("Lookahead Token: " + token.getLexeme());
+        if (doLogging && token != null) {
+            System.out.println("Lookahead: " + token.getLexeme());
+        }
         return token;
     }
 
     Token next() {
         Token token = tokens.pollFirst();
         lastConsumed = token;
-        //if (token != null) System.out.println("Peeked Token: " + token.getLexeme());
+        if (doLogging && token != null) {
+            System.out.println("Next: " + token.getLexeme());
+        }
         return token;
     }
 
-    boolean match(TokenType type) {
+    boolean match(TokenType... types) throws CompileException {
+        String typeMatch = Arrays.stream(types).map(TokenType::toString).reduce((s1,s2)->s1 + ", " + s2).orElseThrow(() -> new CompileException("Syntax Error: Expected match value but none found"));
         Token next = peek();
         if (next == null) return false;
-        //System.out.println("Match Token: " + next.getLexeme() + " To: " + type.toString() + "=" + (next.getType()==type));
-        if (next.getType() == type) {
-            tokens.pollFirst();
-            return true;
+        if (doLogging) {
+            System.out.println("Match: " + next.getLexeme() + " to " + typeMatch);
         }
-        return false;
+        boolean isMatch = false;
+        for (TokenType type : types) {
+            if (next.getType() == type) {
+                if (doLogging) {
+                    System.out.println("Match True");
+                }
+                lastConsumed = tokens.pollFirst();
+                return true;
+            }
+        }
+        return isMatch;
     }
 
     public Token expect(TokenType... expecteds) throws CompileException {
-        String allExpected = Arrays.stream(expecteds).map(Enum::toString).reduce((s1, s2) -> s1 + " " + s2).orElse("");
+        String typeMatch = Arrays.stream(expecteds).map(TokenType::toString).reduce((s1,s2)->s1 + ", " + s2).orElseThrow(() -> new CompileException("Syntax Error: Expected match value but none found"));
         Token token = next();
+        if (doLogging) {
+            System.out.println("Match: " + token.getLexeme() + " to " + typeMatch);
+        }
         lastConsumed = token;
         boolean isError = true;
         for (TokenType expected : expecteds) {
@@ -65,9 +80,10 @@ public class TokenIterator {
         }
         if (isError) {
             throw new CompileException(
-                    "Expected: [" + allExpected + "] but found " + token.getType()
+                    "Syntax Error: Expected " + typeMatch + " but found " + token.getType()
             );
         }
+        lastConsumed = token;
         return token;
     }
 
