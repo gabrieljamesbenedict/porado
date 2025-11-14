@@ -7,18 +7,18 @@ import javax.xml.catalog.Catalog;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import static java.util.Map.entry;
 
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class LexicalAnalyzer {
+
+    private static Deque<Character> history = new ArrayDeque<>();
 
     private static final Map<String, TokenType> KEYWORDS = Map.<String, TokenType>ofEntries(
             entry("as", TokenType.KEYWORD_AS),
@@ -109,6 +109,7 @@ public class LexicalAnalyzer {
 
         while (codeReader.ready()) {
             char c = (char) codeReader.read();
+            history.push(c);
 
             boolean isWhitespace = (c == ' ' || c == '\t' || c == '\r');
             boolean isDelimiter  = DELIMITERS.containsKey(String.valueOf(c));
@@ -159,19 +160,8 @@ public class LexicalAnalyzer {
                         continue;
                     }
 
-                    boolean isIncrement =
-                            c == '+'
-                                    && check == '+';
-                    boolean isDecrement =
-                            c == '-'
-                                    && codeReader.ready()
-                                    && check == '-';
-
-                    if (Character.isLetterOrDigit(check)) {
-                        addToken("neg_op", tokenArrayList);
-                        codeReader.unread(check);
-                        continue;
-                    }
+                    boolean isIncrement = c == '+' && check == '+';
+                    boolean isDecrement = c == '-' && check == '-';
 
                     if (isIncrement) {
                         addToken("++", tokenArrayList);
@@ -221,6 +211,11 @@ public class LexicalAnalyzer {
         } else {
             type = TokenType.IDENTIFIER;
             category = TokenCategory.IDENTIFIER;
+        }
+
+        if (lexeme.equals("negative")) {
+            type = TokenType.OPERATOR_NEGATIVE;
+            category = TokenCategory.OPERATOR;
         }
 
         list.add(new Token(lexeme, type, category));
