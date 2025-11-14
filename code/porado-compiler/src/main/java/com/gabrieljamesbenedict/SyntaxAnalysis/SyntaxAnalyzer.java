@@ -82,8 +82,8 @@ public class SyntaxAnalyzer {
         Node block = addNode(NodeType.BLOCK_STATEMENT, null, parent);
 
         while (!it.eof() && it.peek().getType() != TokenType.DELIMITER_RBRACE) {
-            Node node = parseStatement(it, null);
-            block.addChild(node);
+            Node node = parseStatement(it, block);
+            //block.addChild(node);
         }
 
         it.expect(TokenType.DELIMITER_RBRACE);
@@ -407,14 +407,14 @@ public class SyntaxAnalyzer {
             caseExpression.addChild(parseExpression(it));
             it.expect(TokenType.DELIMITER_COLON);
             Node caseBody = addNode(NodeType.CASE_BODY, null, caseNode);
-            caseBody.addChild(parseStatement(it, caseBody));
+            Node n1 = parseStatement(it, caseExpression);
         }
 
         if (it.match(TokenType.KEYWORD_DEFAULT)) {
             Node defaultNode = addNode(NodeType.DEFAULT, null, casesNode);
             it.expect(TokenType.DELIMITER_COLON);
-            Node caseBody = addNode(NodeType.DEFAULT_BODY, null, defaultNode);
-            caseBody.addChild(parseStatement(it, caseBody));
+            Node defaultBody = addNode(NodeType.DEFAULT_BODY, null, defaultNode);
+            Node n1 = parseStatement(it, defaultBody);
         }
 
         it.expect(TokenType.DELIMITER_RBRACE);
@@ -534,7 +534,8 @@ public class SyntaxAnalyzer {
                     && next.getType() != TokenType.DELIMITER_LPARENTH
                     && next.getType() != TokenType.DELIMITER_RPARENTH
                     && next.getType() != TokenType.DELIMITER_LBRACKET
-                    && next.getType() != TokenType.DELIMITER_RBRACKET)) {
+                    && next.getType() != TokenType.DELIMITER_RBRACKET
+                    && next.getType() != TokenType.DELIMITER_COMMA)) {
                 break;
             }
             tokens.add(next);
@@ -863,11 +864,12 @@ public class SyntaxAnalyzer {
             else if (it.match(TokenType.DELIMITER_LPARENTH)) {
                 Node args = new Node();
                 args.setType(NodeType.FUNCTION_ARGUMENTS);
-                args.setText("ARGUMENTS");
 
                 while (!it.eof() && it.peek().getType() != TokenType.DELIMITER_RPARENTH) {
-                    Node arg = parseExpression(it);
-                    args.addChild(arg);
+                    Token t1 = it.next();
+                    Node arg = addNode(NodeType.FUNCTION_ARGUMENT, null, args);
+                    Node argName = addNode(NodeType.FUNCTION_ARGUMENT_NAME, t1.getLexeme(), arg);
+                    Node argType = addNode(NodeType.FUNCTION_ARGUMENT_TYPE, t1.getType().toString(), arg);
                     it.match(TokenType.DELIMITER_COMMA);
                 }
 
