@@ -837,16 +837,22 @@ public class SyntaxAnalyzer {
         // Literals
         if (it.match(TokenType.LITERAL_INT)) {
             node.setType(NodeType.LITERAL_INT);
+            node.setText(token.getLexeme());
         } else if (it.match(TokenType.LITERAL_FLOAT)) {
             node.setType(NodeType.LITERAL_FLOAT);
+            node.setText(token.getLexeme());
         } else if (it.match(TokenType.LITERAL_CHAR)) {
             node.setType(NodeType.LITERAL_CHAR);
+            node.setText(token.getLexeme());
         } else if (it.match(TokenType.LITERAL_STRING)) {
             node.setType(NodeType.LITERAL_STRING);
+            node.setText(token.getLexeme());
         } else if (it.match(TokenType.LITERAL_TRUE)) {
             node.setType(NodeType.LITERAL_TRUE);
+            node.setText(token.getLexeme());
         } else if (it.match(TokenType.LITERAL_FALSE)) {
             node.setType(NodeType.LITERAL_FALSE);
+            node.setText(token.getLexeme());
         }
 
         // Identifiers (variables, arrays, function calls)
