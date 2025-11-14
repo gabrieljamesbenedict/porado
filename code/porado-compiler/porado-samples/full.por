@@ -1,4 +1,4 @@
-
+/*
 num as int = a * b - c / d + (1 + 2);
 num2 as int = 1 + 2 - 3 * 4 / 5 % 1 + (1 + 2 + 3);
 nums as array of 1+2+3 int;
@@ -23,3 +23,13 @@ else if (num == 3) then num + 3
 else if (num == 4) then num + 4
 else if (num == 5) then num + 5
 else then num * 10;
+
+
+switch (num) {
+    case(1): num = 1;
+    case(2): num = 2;
+    case(3): num = 3;
+    case(4): num = 4;
+    default: num = 0;
+}
+*/

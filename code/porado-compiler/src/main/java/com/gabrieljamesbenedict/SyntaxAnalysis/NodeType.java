@@ -51,8 +51,13 @@ public enum NodeType {
     ELSE_BODY,
 
     SWITCH,
+    SWITCH_EXPRESSION,
+    CASES,
     CASE,
+    CASE_EXPRESSION,
+    CASE_BODY,
     DEFAULT,
+    DEFAULT_BODY,
 
     WHILE_LOOP,
     DO_WHILE_LOOP,

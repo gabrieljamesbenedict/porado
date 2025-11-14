@@ -84,34 +84,30 @@ public class SyntaxAnalyzer {
         Token current = it.peek();
         Token ahead = it.lookahead(1);
 
-        Node stmt;
+        Node stmt = null;
 
         // Declarations
         if (current.getCategory() == TokenCategory.IDENTIFIER && ahead.getType() == TokenType.KEYWORD_AS) {
             if (doLogging) System.out.println("Parsing Declaration");
             stmt = parseDeclaration(it, parent);
-            return stmt;
         }
 
         // Conditional
         else if (current.getType() == TokenType.KEYWORD_IF) {
             if (doLogging) System.out.println("Parsing Conditional");
             stmt = parseConditional(it, parent);
-            return stmt;
         }
 
         // Switch
         else if (current.getType() == TokenType.KEYWORD_SWITCH) {
             if (doLogging) System.out.println("Parsing Switch");
             stmt = parseSwitch(it, parent);
-            return stmt;
         }
 
         // Loops
         else if (isLoopKeyword(current.getType())) {
             if (doLogging) System.out.println("Parsing Loop");
             stmt = parseLoop(it, parent);
-            return stmt;
         }
 
         // Return
@@ -123,7 +119,6 @@ public class SyntaxAnalyzer {
                 addNode(NodeType.NO_RETURN, null, stmt);
             else
                 stmt.addChild(parseExpression(it));
-            return stmt;
         }
 
         // EOF
@@ -131,18 +126,20 @@ public class SyntaxAnalyzer {
             it.next();
             if (doLogging) System.out.println("Parsing EOF");
             stmt = addNode(NodeType.EOF, "EOF", parent);
-            return stmt;
         }
 
         // Expression
         else if (isExpression(current)) {
             if (doLogging) System.out.println("Parsing Expression");
             stmt = parseExpression(it);
-            return stmt;
         }
 
 
-        throw new CompileException("Syntax Error: Unexpected statement " + current.getLexeme());
+        if (stmt == null) throw new CompileException("Syntax Error: Unexpected statement " + current.getLexeme());
+        else {
+            it.match(TokenType.DELIMITER_SEMICOLON);
+            return stmt;
+        }
     }
 
     private static boolean isLoopKeyword(TokenType type) {
@@ -351,43 +348,38 @@ public class SyntaxAnalyzer {
     // ---------------------------------------------------------------------------
 
     private static Node parseSwitch(TokenIterator it, Node parent) throws CompileException {
-        Token token = it.expect(TokenType.KEYWORD_SWITCH);
-        Node switchNode = addNode(NodeType.SWITCH, token.getLexeme(), parent);
+        Node switchNode = addNode(NodeType.SWITCH, null, parent);
 
-        it.expect(TokenType.DELIMITER_LPARENTH);
-        Node switchExpr = parseExpression(it);
-        it.expect(TokenType.DELIMITER_RPARENTH);
-
-        it.expect(TokenType.DELIMITER_LBRACKET);
-
-        while (!it.eof() && !it.match(TokenType.DELIMITER_RBRACKET)) {
-            Node caseNode = parseCase(it, switchNode);
+        if (!it.match(TokenType.KEYWORD_SWITCH)) {
+            throw new CompileException("Syntax Error: Expected switch keyword");
         }
+
+        Node switchExpression = addNode(NodeType.SWITCH_EXPRESSION, null, switchNode);
+        switchExpression.addChild(parseExpression(it));
+
+        it.expect(TokenType.DELIMITER_LBRACE);
+
+        Node casesNode = addNode(NodeType.CASES, null, switchNode);
+        while (!it.eof() && it.match(TokenType.KEYWORD_CASE)) {
+            Node caseNode = addNode(NodeType.CASE, null, casesNode);
+            Node caseExpression = addNode(NodeType.CASE_EXPRESSION, null, caseNode);
+            caseExpression.addChild(parseExpression(it));
+            it.expect(TokenType.DELIMITER_COLON);
+            Node caseBody = addNode(NodeType.CASE_BODY, null, caseNode);
+            caseBody.addChild(parseStatement(it, caseBody));
+        }
+
+        if (it.match(TokenType.KEYWORD_DEFAULT)) {
+            Node defaultNode = addNode(NodeType.DEFAULT, null, casesNode);
+            it.expect(TokenType.DELIMITER_COLON);
+            Node caseBody = addNode(NodeType.DEFAULT_BODY, null, defaultNode);
+            caseBody.addChild(parseStatement(it, caseBody));
+        }
+
+        it.expect(TokenType.DELIMITER_RBRACE);
 
         return switchNode;
     }
-
-    private static Node parseCase(TokenIterator it, Node parent) throws CompileException {
-
-        Node caseNode;
-
-        if (it.match(TokenType.KEYWORD_CASE)) {
-            caseNode = addNode(NodeType.CASE, "CASE", parent);
-            it.expect(TokenType.DELIMITER_LPARENTH);
-            Node caseExpr = parseExpression(it);
-            it.expect(TokenType.DELIMITER_RPARENTH);
-        } else if (it.match(TokenType.KEYWORD_DEFAULT)) {
-            caseNode = addNode(NodeType.DEFAULT, "DEFAULT", parent);
-        } else {
-            throw new CompileException("Syntax Error: Invalid case in switch");
-        }
-
-        it.expect(TokenType.DELIMITER_COLON);
-        Node caseBody = parseStatement(it, caseNode);
-
-        return caseNode;
-    }
-
 
     // ---------------------------------------------------------------------------
     // LOOPS
