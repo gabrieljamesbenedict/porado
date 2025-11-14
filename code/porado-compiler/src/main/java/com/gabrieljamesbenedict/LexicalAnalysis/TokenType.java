@@ -10,6 +10,7 @@ public enum TokenType {
     KEYWORD_IF,
     KEYWORD_THEN,
     KEYWORD_ELSE,
+    KEYWORD_ELSEIF,
     KEYWORD_SWITCH,
     KEYWORD_CASE,
     KEYWORD_DEFAULT,

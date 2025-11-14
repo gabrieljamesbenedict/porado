@@ -2,6 +2,7 @@ package com.gabrieljamesbenedict.LexicalAnalysis;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,7 +13,7 @@ public class TokenPostProcesser {
 
     public Stream<Token> clean(Stream<Token> tokenStream) {
 
-        Stream<Token> s =tokenStream
+        Stream<Token> s = tokenStream
                 .peek(
                         token -> {
                             if (checkIfLiteral(token.getLexeme()) != null) {
@@ -30,13 +31,14 @@ public class TokenPostProcesser {
                             };
                             token.setLexeme(newLexeme);
                         }
-                ).filter(
+                )
+                .filter(
                         token -> token.getCategory() != TokenCategory.NEWLINE
                 ).filter(
                         token -> token.getCategory() != TokenCategory.WHITESPACE
                 );
 
-        List<Token> tokenList = s.toList();
+        List<Token> tokenList = new ArrayList<>(s.toList());
         for (int i = 0; i < tokenList.size()-1; i++) {
             if (i == 0) {
                 if (tokenList.get(i).getType() == TokenType.OPERATOR_MINUS) {
@@ -57,6 +59,29 @@ public class TokenPostProcesser {
                 tokenList.get(i).setType(TokenType.OPERATOR_NEGATIVE);
             }
         }
+
+        for (int i = 1; i < tokenList.size(); i++) {
+            Token prev = tokenList.get(i - 1);
+            Token curr = tokenList.get(i);
+
+            if (prev.getType() == TokenType.KEYWORD_ELSE &&
+                    curr.getType() == TokenType.KEYWORD_IF) {
+
+                // Replace the "else"
+                tokenList.set(i - 1, new Token(
+                        "else-if",
+                        TokenType.KEYWORD_ELSEIF,
+                        TokenCategory.KEYWORD
+                ));
+
+                // Remove the "if"
+                tokenList.remove(i);
+
+                // Step back to avoid skipping a token
+                i--;
+            }
+        }
+
 
         return tokenList.stream();
     }
