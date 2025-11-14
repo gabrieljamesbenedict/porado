@@ -136,17 +136,18 @@ public class SyntaxAnalyzer {
                 stmt.addChild(parseExpression(it));
         }
 
+        // Expression
+        else if (isExpression(current)) {
+            if (doLogging) System.out.println("Parsing Expression");
+            stmt = parseExpression(it);
+            parent.addChild(stmt);
+        }
+
         // EOF
         else if (current.getType() == TokenType.EOF) {
             it.next();
             if (doLogging) System.out.println("Parsing EOF");
             stmt = addNode(NodeType.EOF, "EOF", parent);
-        }
-
-        // Expression
-        else if (isExpression(current)) {
-            if (doLogging) System.out.println("Parsing Expression");
-            stmt = parseExpression(it);
         }
 
         if (stmt != null) {
@@ -463,7 +464,7 @@ public class SyntaxAnalyzer {
                 Node repVar = addNode(NodeType.REPEAT_VARIABLE, t1.getLexeme(), loopNode);
                 if (it.match(TokenType.OPERATOR_ASSIGN)) {
                     Token t3 = it.expect(TokenType.IDENTIFIER, TokenType.LITERAL_INT);
-                    Node repVarStart = addNode(NodeType.REPEAT_VARIABLE_START, null, loopNode);
+                    Node repVarStart = addNode(NodeType.REPEAT_VARIABLE_START, t3.getLexeme(), loopNode);
                 }
             }
             Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
