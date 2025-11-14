@@ -39,6 +39,7 @@ public class SyntaxAnalyzer {
 
     private static void parseProgram(TokenIterator it, Node parent) throws CompileException {
         while (!it.eof()) {
+            System.out.println("\nNew Statement:");
             parseStatement(it, parent);
         }
     }
@@ -50,32 +51,41 @@ public class SyntaxAnalyzer {
             return addNode(NodeType.EOF, null, parent);
         }
 
-        // Empty statement
         if (it.match(TokenType.DELIMITER_SEMICOLON)) {
+            System.out.println("Empty Statement");
             return addNode(NodeType.EMPTY_STATEMENT, null, parent);
         }
 
-        // Block statement
         if (it.match(TokenType.DELIMITER_LBRACE)) {
-            System.out.println("Parsing Block Statement");
+            System.out.println("Block Statement");
             return parseBlockStatement(it, parent);
         }
 
-        // Everything else is a single statement
-        System.out.println("Parsing Single Statement");
-        return parseSingleStatement(it, parent);
+        System.out.println("Single Statement");
+        Node stmt = parseSingleStatement(it, parent);
+        if (it.previous().getType() != TokenType.DELIMITER_RBRACE) {
+            System.out.println("Wheres the semicolon?");
+            it.expect(TokenType.DELIMITER_SEMICOLON);
+        }
+
+        return stmt;
     }
+
 
 
     private static Node parseBlockStatement(TokenIterator it, Node parent) throws CompileException {
+
         Node block = addNode(NodeType.BLOCK_STATEMENT, null, parent);
+
         while (!it.eof() && it.peek().getType() != TokenType.DELIMITER_RBRACE) {
             parseStatement(it, block);
         }
+
         it.expect(TokenType.DELIMITER_RBRACE);
-        System.out.println("Done BLock");
+
         return block;
     }
+
 
     private static boolean doLogging = true;
 
@@ -134,12 +144,13 @@ public class SyntaxAnalyzer {
             stmt = parseExpression(it);
         }
 
-
-        if (stmt == null) throw new CompileException("Syntax Error: Unexpected statement " + current.getLexeme());
-        else {
-            it.match(TokenType.DELIMITER_SEMICOLON);
+        if (stmt != null) {
             return stmt;
         }
+
+
+        throw new CompileException("Syntax Error: Unexpected statement " + current.getLexeme());
+
     }
 
     private static boolean isLoopKeyword(TokenType type) {
@@ -386,117 +397,23 @@ public class SyntaxAnalyzer {
     // ---------------------------------------------------------------------------
 
     private static Node parseLoop(TokenIterator it, Node parent) throws CompileException {
+        Node loop = addNode(NodeType.LOOP, null, parent);
 
-        Token keyword = it.peek();
-
-        if (keyword.getType() == TokenType.KEYWORD_WHILE) {
-            it.next();
-            Node loop = addNode(NodeType.WHILE_LOOP, "WHILE", parent);
-            it.expect(TokenType.DELIMITER_LPARENTH);
-            Node loopExpr = parseExpression(it);
-            it.expect(TokenType.DELIMITER_RPARENTH);
-            Node loopBody = parseStatement(it, loop);
-
-            loop.addAllChildren(loopExpr, loopBody);
-            return loop;
+        if (it.match(TokenType.KEYWORD_WHILE)) {
+            Node loopNode = addNode(NodeType.WHILE, null, loop);
+            Node loopCondition = addNode(NodeType.LOOP_CONDITION, null, loopNode);
+            loopCondition.addChild(parseExpression(it));
+            Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
         }
 
-        if (keyword.getType() == TokenType.KEYWORD_UNTIL) {
-            it.next();
-            Node loop = addNode(NodeType.UNTIL_LOOP, "UNTIL", parent);
-            it.expect(TokenType.DELIMITER_LPARENTH);
-            Node loopExpr = parseExpression(it);
-            it.expect(TokenType.DELIMITER_RPARENTH);
-            Node loopBody = parseStatement(it, loop);
-
-            loop.addAllChildren(loopExpr, loopBody);
-            return loop;
+        else if (it.match(TokenType.KEYWORD_UNTIL)) {
+            Node loopNode = addNode(NodeType.UNTIL, null, loop);
+            Node loopCondition = addNode(NodeType.LOOP_CONDITION, null, loopNode);
+            loopCondition.addChild(parseExpression(it));
+            Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
         }
 
-        if (keyword.getType() == TokenType.KEYWORD_DO) {
-            it.next();
-            Node loop = addNode(null, "DO", parent);
-
-            Node loopBody = parseStatement(it, loop);
-
-            if (it.match(TokenType.KEYWORD_WHILE)) {
-                loop.setType(NodeType.DO_WHILE_LOOP);
-                loop.setText("DO-WHILE");
-            } else if (it.match(TokenType.KEYWORD_UNTIL)) {
-                loop.setType(NodeType.DO_UNTIL_LOOP);
-                loop.setText("DO-UNTIL");
-            } else {
-                throw new CompileException("Syntax Error: Expected WHILE or UNTIL after DO");
-            }
-
-            it.expect(TokenType.DELIMITER_LPARENTH);
-            Node loopExpr = parseExpression(it);
-            it.expect(TokenType.DELIMITER_RPARENTH);
-
-            loop.addAllChildren(loopExpr, loopBody);
-            return loop;
-        }
-
-        if (keyword.getType() == TokenType.KEYWORD_FOR) {
-            it.next();
-            Node loop = addNode(NodeType.FOR_LOOP, "FOR", parent);
-
-            it.expect(TokenType.DELIMITER_LPARENTH);
-            it.expect(TokenType.KEYWORD_EACH);
-
-            Token var = it.expect(TokenType.IDENTIFIER);
-            Node loopVar = addNode(NodeType.VARIABLE_NAME, var.getLexeme(), loop);
-
-            it.expect(TokenType.KEYWORD_IN);
-
-            Token arr = it.peek();
-            Node loopArr;
-            if (it.match(TokenType.IDENTIFIER)) {
-                loopArr = addNode(NodeType.ARRAY_NAME, arr.getLexeme(), loop);
-                ;
-            } else if (it.match(TokenType.DELIMITER_LBRACE)) {
-                loopArr = parseLiteralArray(it);
-                loop.addChild(loopArr);
-            } else {
-                throw new CompileException("Syntax Error: Unexpected symbol in array declaration " + it.peek().getLexeme());
-            }
-
-            it.expect(TokenType.DELIMITER_RPARENTH);
-            Node loopBody = parseStatement(it, loop);
-            it.expect(TokenType.DELIMITER_LPARENTH);
-
-            loop.addAllChildren(loopVar, loopArr, loopBody);
-
-            return loop;
-        }
-
-        if (keyword.getType() == TokenType.KEYWORD_REPEAT) {
-            it.next();
-            Node loop = addNode(NodeType.REPEAT_LOOP, "REPEAT", parent);
-
-            it.expect(TokenType.DELIMITER_LPARENTH);
-            Token count = it.expect(TokenType.LITERAL_INT, TokenType.IDENTIFIER);
-            Node loopAm = addNode(NodeType.REPEAT_AMOUNT, count.getLexeme(), loop);
-            it.expect(TokenType.DELIMITER_RPARENTH);
-
-            if (it.match(TokenType.KEYWORD_WITH)) {
-                Token var = it.expect(TokenType.IDENTIFIER);
-                Node arrVar = addNode(NodeType.VARIABLE_NAME, var.getLexeme(), loop);
-                it.expect(TokenType.KEYWORD_AS);
-                Token token = it.expect(TokenType.TYPE_INT,
-                        TokenType.TYPE_FLOAT,
-                        TokenType.TYPE_CHAR,
-                        TokenType.TYPE_STRING,
-                        TokenType.TYPE_BOOLEAN);
-                Node arrVarType = addNode(NodeType.VARIABLE_TYPE, token.getLexeme(), arrVar);
-            }
-
-            Node loopBody = parseStatement(it, loop);
-
-            return loop;
-        }
-
-        throw new CompileException("Invalid loop");
+        return loop;
     }
 
     // ---------------------------------------------------------------------------
@@ -527,9 +444,6 @@ public class SyntaxAnalyzer {
         ArrayList<Token> tokens = new ArrayList<>();
 
         while (true) {
-            Token token = it.next();
-            tokens.add(token);
-            System.out.println("Adding to stream: " + token.getLexeme());
             Token next = it.peek();
             if (next == null) break;
             if (
@@ -540,7 +454,9 @@ public class SyntaxAnalyzer {
                     && next.getType() != TokenType.DELIMITER_RPARENTH)) {
                 break;
             }
-
+            tokens.add(next);
+            System.out.println("Adding to stream: " + next.getLexeme());
+            it.next();
         }
 
         TokenIterator expressionStream = new TokenIterator(tokens.stream());
@@ -848,9 +764,5 @@ public class SyntaxAnalyzer {
 
         return node;
     }
-
-
-
-
 
 }

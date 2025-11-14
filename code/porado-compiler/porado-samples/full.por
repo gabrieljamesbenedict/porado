@@ -1,4 +1,3 @@
-/*
 num as int = a * b - c / d + (1 + 2);
 num2 as int = 1 + 2 - 3 * 4 / 5 % 1 + (1 + 2 + 3);
 nums as array of 1+2+3 int;
@@ -8,7 +7,7 @@ nums3 as array of int = nums2;
 addNums as function accepts (num1 as int, num2 as int) returns int {
     return num + num1;
 }
-
+/*
 getNum as function returns int {
     return num;
 }
@@ -24,6 +23,16 @@ else if (num == 4) then num + 4
 else if (num == 5) then num + 5
 else then num * 10;
 
+if (num > 0) then {
+    num + 1;
+    num + 1;
+    num + 1;
+} else then {
+    num - 1;
+    num - 1;
+    num - 1;
+}
+
 
 switch (num) {
     case(1): num = 1;
@@ -32,4 +41,14 @@ switch (num) {
     case(4): num = 4;
     default: num = 0;
 }
-*/
+
+
+
+while (num < 100) {
+    num + 1;
+}
+
+until (num = 100) {
+    num + 1;
+}
+/*
