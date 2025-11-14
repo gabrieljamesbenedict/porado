@@ -175,6 +175,7 @@ atomic-expression =
     | literal
     | array-literal
     | function-expression
+    | array-expression
     ;
 
 
@@ -301,4 +302,10 @@ condition-expression =
 (* FUNCTIONS *)
 function-expression =
     "IDENTIFIER", "DELIMITER_LPARENTH", {expression}, "DELIMITER_RPARENTH"
+    ;
+
+
+(* ARRAYS *)
+array-expression =
+    "IDENTIFIER", "DELIMITER_LBRACE", {expression}, "DELIMITER_RBRACE"
     ;

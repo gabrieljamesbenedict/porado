@@ -1,5 +1,6 @@
 package com.gabrieljamesbenedict;
 
+import com.gabrieljamesbenedict.Exceptions.CompileException;
 import com.gabrieljamesbenedict.LexicalAnalysis.LexicalAnalyzer;
 import com.gabrieljamesbenedict.LexicalAnalysis.Token;
 import com.gabrieljamesbenedict.SyntaxAnalysis.AbstractSyntaxTree;
@@ -7,7 +8,7 @@ import com.gabrieljamesbenedict.SyntaxAnalysis.SyntaxAnalyzer;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class PoradoCompiler
@@ -45,16 +46,26 @@ public class PoradoCompiler
 
                 // FIVE STEPS OF COMPILATION
                 Stream<Token> tokenStream = LexicalAnalyzer.tokenize(reader);
-                AbstractSyntaxTree ast = SyntaxAnalyzer.parse(tokenStream);
+                List<Token> copy = tokenStream.toList();
 
-                for (Token token : tokenStream.toList()) {
+                for (Token token : copy) {
                     System.out.println(token.toString());
                 }
+
+
+                AbstractSyntaxTree ast = SyntaxAnalyzer.parse(copy.stream());
+
+                System.out.println("AST:");
+                ast.print();
+
             } catch (FileNotFoundException e) {
                 System.out.println("Error: Cannot find file \"" + file.getName() + "\"");
                 return;
             } catch (IOException e) {
                 System.out.println("Error: Something went wrong while reading the file \"" + file.getName() + "\"");
+                return;
+            } catch (CompileException e) {
+                System.out.println(e.getMessage());
                 return;
             }
         }
