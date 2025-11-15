@@ -46,7 +46,7 @@ public class Porado
                 Stream<Token> tokenStream = LexicalAnalyzer.tokenize(reader);
                 List<Token> copy = tokenStream.toList();
                 AbstractSyntaxTree ast = SyntaxAnalyzer.parse(copy.stream());
-                ast.print();
+                //ast.print();
                 CodeRunner runner = new CodeRunner(ast);
                 runner.run();
 
