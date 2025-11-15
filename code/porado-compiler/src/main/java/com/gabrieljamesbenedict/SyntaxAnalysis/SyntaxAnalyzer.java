@@ -39,7 +39,6 @@ public class SyntaxAnalyzer {
 
     private static void parseProgram(TokenIterator it, Node parent) throws CompileException {
         while (!it.eof()) {
-            System.out.println("\nNew Statement:");
             parseStatement(it, parent);
         }
     }
@@ -52,16 +51,13 @@ public class SyntaxAnalyzer {
         }
 
         if (it.match(TokenType.DELIMITER_SEMICOLON)) {
-            System.out.println("Empty Statement");
             return addNode(NodeType.EMPTY_STATEMENT, null, parent);
         }
 
         if (it.match(TokenType.DELIMITER_LBRACE)) {
-            System.out.println("Block Statement");
             return parseBlockStatement(it, parent);
         }
 
-        System.out.println("Single Statement");
         Node stmt = parseSingleStatement(it, parent);
         // Only expect semicolon if it is a statement that needs it
 
@@ -92,8 +88,6 @@ public class SyntaxAnalyzer {
     }
 
 
-    private static boolean doLogging = true;
-
     private static Node parseSingleStatement(TokenIterator it, Node parent) throws CompileException {
 
         Token current = it.peek();
@@ -103,32 +97,27 @@ public class SyntaxAnalyzer {
 
         // Declarations
         if (current.getCategory() == TokenCategory.IDENTIFIER && ahead.getType() == TokenType.KEYWORD_AS) {
-            if (doLogging) System.out.println("Parsing Declaration");
             stmt = parseDeclaration(it, parent);
         }
 
         // Conditional
         else if (current.getType() == TokenType.KEYWORD_IF) {
-            if (doLogging) System.out.println("Parsing Conditional");
             stmt = parseConditional(it, parent);
         }
 
         // Switch
         else if (current.getType() == TokenType.KEYWORD_SWITCH) {
-            if (doLogging) System.out.println("Parsing Switch");
             stmt = parseSwitch(it, parent);
         }
 
         // Loops
         else if (isLoopKeyword(current.getType())) {
-            if (doLogging) System.out.println("Parsing Loop");
             stmt = parseLoop(it, parent);
         }
 
         // Return
         else if (current.getType() == TokenType.KEYWORD_RETURN) {
             it.next();
-            if (doLogging) System.out.println("Parsing Return Statement");
             stmt = addNode(NodeType.RETURN_STATEMENT, it.previous().getLexeme(), parent);
             if (it.peek().getType() == TokenType.DELIMITER_SEMICOLON)
                 addNode(NodeType.NO_RETURN, null, stmt);
@@ -139,21 +128,18 @@ public class SyntaxAnalyzer {
         // Break
         else if (current.getType() == TokenType.KEYWORD_BREAK) {
             it.next();
-            if (doLogging) System.out.println("Parsing Break Statement");
             stmt = addNode(NodeType.BREAK, null, parent);
         }
 
         // Continue
         else if (current.getType() == TokenType.KEYWORD_CONTINUE) {
             it.next();
-            if (doLogging) System.out.println("Parsing Continue Statement");
             stmt = addNode(NodeType.CONTINUE, null, parent);
         }
 
         // Print
         else if (current.getType() == TokenType.KEYWORD_PRINT) {
             it.next();
-            if (doLogging) System.out.println("Parsing Print Statement");
             stmt = addNode(NodeType.PRINT, null, parent);
             Node printExpr = parseExpression(it);
             stmt.addChild(printExpr);
@@ -161,7 +147,6 @@ public class SyntaxAnalyzer {
 
         // Expression
         else if (isExpression(current)) {
-            if (doLogging) System.out.println("Parsing Expression");
             stmt = parseExpression(it);
             parent.addChild(stmt);
         }
@@ -169,7 +154,6 @@ public class SyntaxAnalyzer {
         // EOF
         else if (current.getType() == TokenType.EOF) {
             it.next();
-            if (doLogging) System.out.println("Parsing EOF");
             stmt = addNode(NodeType.EOF, "EOF", parent);
         }
 
@@ -227,9 +211,9 @@ public class SyntaxAnalyzer {
     }
 
 
-    // ---------------------------------------------------------------------------
-    // DECLARATIONS
-    // ---------------------------------------------------------------------------
+
+
+
 
     private static Node parseDeclaration(TokenIterator it, Node parent) throws CompileException {
         Node decl = addNode(null, null, parent);
@@ -288,7 +272,6 @@ public class SyntaxAnalyzer {
 
         if (decl.getType() == NodeType.FUNCTION_DECLARATION) {
 
-            System.out.println("Check Parameter");
             boolean hasParam = it.match(TokenType.KEYWORD_ACCEPTS);
             if (hasParam) {
                 it.expect(TokenType.DELIMITER_LPARENTH);
@@ -306,7 +289,6 @@ public class SyntaxAnalyzer {
                 it.expect(TokenType.DELIMITER_RPARENTH);
             }
 
-            System.out.println("Check Return Type");
             boolean hasReturn = it.match(TokenType.KEYWORD_RETURNS);
             if (hasReturn) {
                 Token t2 = it.next();
@@ -323,7 +305,6 @@ public class SyntaxAnalyzer {
                 addNode(type, t2.getLexeme(), t1);
             }
 
-            System.out.println("Check function body");
             Node functionBody = addNode(NodeType.FUNCTION_BODY, null, decl);
             parseStatement(it, functionBody);
 
@@ -343,13 +324,15 @@ public class SyntaxAnalyzer {
             }
         }
 
-        System.out.println("Done Declaration");
         return decl;
     }
 
-    // ---------------------------------------------------------------------------
-    // CONDITIONALS
-    // ---------------------------------------------------------------------------
+
+
+
+
+
+
 
     private static Node parseConditional(TokenIterator it, Node parent) throws CompileException {
         Node cond = addNode(NodeType.CONDITIONAL, null, parent);
@@ -384,9 +367,12 @@ public class SyntaxAnalyzer {
         return cond;
     }
 
-    // ---------------------------------------------------------------------------
-    // SWITCH
-    // ---------------------------------------------------------------------------
+
+
+
+
+
+
 
     private static Node parseSwitch(TokenIterator it, Node parent) throws CompileException {
         Node switchNode = addNode(NodeType.SWITCH, null, parent);
@@ -407,14 +393,14 @@ public class SyntaxAnalyzer {
             caseExpression.addChild(parseExpression(it));
             it.expect(TokenType.DELIMITER_COLON);
             Node caseBody = addNode(NodeType.CASE_BODY, null, caseNode);
-            Node n1 = parseStatement(it, caseExpression);
+            caseBody.addChild(parseStatement(it, null));
         }
 
         if (it.match(TokenType.KEYWORD_DEFAULT)) {
             Node defaultNode = addNode(NodeType.DEFAULT, null, casesNode);
             it.expect(TokenType.DELIMITER_COLON);
             Node defaultBody = addNode(NodeType.DEFAULT_BODY, null, defaultNode);
-            Node n1 = parseStatement(it, defaultBody);
+            defaultBody.addChild(parseStatement(it, null));
         }
 
         it.expect(TokenType.DELIMITER_RBRACE);
@@ -422,9 +408,13 @@ public class SyntaxAnalyzer {
         return switchNode;
     }
 
-    // ---------------------------------------------------------------------------
-    // LOOPS
-    // ---------------------------------------------------------------------------
+
+
+
+
+
+
+
 
     private static Node parseLoop(TokenIterator it, Node parent) throws CompileException {
         Node loop = addNode(NodeType.LOOP, null, parent);
@@ -470,8 +460,8 @@ public class SyntaxAnalyzer {
             it.expect(TokenType.KEYWORD_IN);
             Token t2 = it.expect(TokenType.IDENTIFIER);
             it.expect(TokenType.DELIMITER_RPARENTH);
-            Node loopVar = addNode(NodeType.FOR_VARIABLE, null, loopNode);
-            Node loopArr = addNode(NodeType.FOR_ARRAY, null, loopNode);
+            Node loopVar = addNode(NodeType.FOR_VARIABLE, t1.getLexeme(), loopNode);
+            Node loopArr = addNode(NodeType.FOR_ARRAY, t2.getLexeme(), loopNode);
             Node loopBody = addNode(NodeType.LOOP_BODY, null, loopNode);
             parseStatement(it, loopBody);
         }
@@ -539,13 +529,11 @@ public class SyntaxAnalyzer {
                 break;
             }
             tokens.add(next);
-            System.out.println("Adding to stream: " + next.getLexeme());
             it.next();
         }
 
         TokenIterator expressionStream = new TokenIterator(tokens.stream());
         Node expressionNode = parseAssignment(expressionStream);
-        System.out.println("All Done");
         return expressionNode;
     }
 
@@ -581,6 +569,10 @@ public class SyntaxAnalyzer {
             Node right = parseAssignment(it);
             if (right == null)
                 throw new CompileException("Expected expression after " + op.getLexeme());
+
+            if (left.getType() != NodeType.VARIABLE_ACCESS && left.getType() != NodeType.ARRAY_ACCESS) {
+                throw new CompileException("Invalid assignment target: " + left.getType());
+            }
 
             Node node = new Node();
             node.setType(type);
@@ -804,7 +796,6 @@ public class SyntaxAnalyzer {
 
         // Atomic expressions
         else {
-            System.out.println("Going atomic.");
             Node node = parseAtomic(it);
 
             // Post-increment / Post-decrement
@@ -843,10 +834,10 @@ public class SyntaxAnalyzer {
             node.setText(token.getLexeme());
         } else if (it.match(TokenType.LITERAL_CHAR)) {
             node.setType(NodeType.LITERAL_CHAR);
-            node.setText(token.getLexeme());
+            node.setText("'" + token.getLexeme() + "'");
         } else if (it.match(TokenType.LITERAL_STRING)) {
             node.setType(NodeType.LITERAL_STRING);
-            node.setText(token.getLexeme());
+            node.setText("\"" + token.getLexeme() + "\"");
         } else if (it.match(TokenType.LITERAL_TRUE)) {
             node.setType(NodeType.LITERAL_TRUE);
             node.setText(token.getLexeme());
@@ -858,6 +849,8 @@ public class SyntaxAnalyzer {
         // Identifiers (variables, arrays, function calls)
         else if (it.match(TokenType.IDENTIFIER)) {
             node.setType(NodeType.VARIABLE_ACCESS);
+            node.setText(it.previous().getLexeme());
+
 
             // Array access
             if (it.match(TokenType.DELIMITER_LBRACKET)) {

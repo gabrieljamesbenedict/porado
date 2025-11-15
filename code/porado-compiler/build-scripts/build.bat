@@ -10,8 +10,10 @@ jpackage ^
   --dest ./ ^
   --name porado ^
   --main-jar porado-compiler-1.jar ^
-  --main-class com.gabrieljamesbenedict.PoradoCompiler ^
+  --main-class com.gabrieljamesbenedict.Porado^
   --type app-image ^
   --win-console
 
 rar a -r "porado.rar" "porado"
+
+pause

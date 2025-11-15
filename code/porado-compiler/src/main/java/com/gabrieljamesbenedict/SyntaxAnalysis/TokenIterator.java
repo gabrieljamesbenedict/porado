@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class TokenIterator {
 
     private final Deque<Token> tokens;
-    private boolean doLogging = true;
+    private boolean doLogging = false;
     Token lastConsumed = null;
 
     TokenIterator(Stream<Token> tokenStream) {
@@ -68,10 +68,10 @@ public class TokenIterator {
     public Token expect(TokenType... expecteds) throws CompileException {
         String typeMatch = Arrays.stream(expecteds).map(TokenType::toString).reduce((s1,s2)->s1 + ", " + s2).orElseThrow(() -> new CompileException("Syntax Error: Expected match value but none found"));
         Token token = next();
+        lastConsumed = token;
         if (doLogging) {
             System.out.println("Match: " + token.getLexeme() + " to " + typeMatch);
         }
-        lastConsumed = token;
         boolean isError = true;
         for (TokenType expected : expecteds) {
             if (token.getType() == expected) {

@@ -10,7 +10,7 @@ public class Node {
     NodeType type;
     String text;
 
-    Node parent;
+    transient Node parent;
     ArrayList<Node> children = new ArrayList<>();
 
     public void addChild(Node node) {
@@ -21,6 +21,12 @@ public class Node {
         for (Node node : nodes) {
             addChild(node);
         }
+    }
+
+    public Node getChildById(NodeType type) {
+        return children.stream().filter(n -> n.getType() == type).findFirst().orElseThrow(
+                () -> new RuntimeException("Error: No such child")
+        );
     }
 
 }
