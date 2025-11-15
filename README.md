@@ -139,8 +139,6 @@ num3 = nums[-1] // Runtime error
 num4 = nums[10] // Runtime error
 ```
 
-
-
 ## Operators
 
 Operators are used to perform different operations on numerical values. Operators in Porado fall into these categories: **arithmetic**, **assignment**, **comparison**, and **logical**.
@@ -149,23 +147,23 @@ Operators are used to perform different operations on numerical values. Operator
 
 Arithmetic operators perform computations between two numerical literals or expressions.
 
-| Operator | Name | Description | Format |
-|:--------:|:-----|:-----------:|:------:|
-| + | Addition | Adds two values | A + B |
-| - | Subtraction | Subtracts one value from the other | A - B |
-| * | Multiplication | Mutliplies two values | A * B |
-| / | Division | Divides one value by the other | A / B |
-| % | Modulo | Returns the division remainder | A % B |
+| Operator | Name           |            Description             | Format |
+|:--------:|:---------------|:----------------------------------:|:------:|
+|    +     | Addition       |          Adds two values           | A + B  |
+|    -     | Subtraction    | Subtracts one value from the other | A - B  |
+|    *     | Multiplication |       Mutliplies two values        | A * B  |
+|    /     | Division       |   Divides one value by the other   | A / B  |
+|    %     | Modulo         |   Returns the division remainder   | A % B  |
 
 #### Unary Arithmetic Operators
 
 Some arithmetic operators only has one operand.
 
-| Operator | Name | Description | Format |
-|:--------:|:-----|:-----------:|:------:|
-| ++ | Increment | Add 1 to value | ++A or A++ |
-| -- | Decrement | Remove 1 from value | --A or A-- |
-| - | Negative Symbol | Inverts the sign of the value | -A |
+| Operator | Name            |          Description          |   Format   |
+|:--------:|:----------------|:-----------------------------:|:----------:|
+|    ++    | Increment       |        Add 1 to value         | ++A or A++ |
+|    --    | Decrement       |      Remove 1 from value      | --A or A-- |
+|    -     | Negative Symbol | Inverts the sign of the value |     -A     |
 
 **Note:** Increment and Decrement operators can be appended to either the left or right side of the operand. When on the left side, the pre-increment or pre-decrement operator performs its operation before the value is accessed. On the right side, the value is accessed first before the operand performs its operation. Increment and decremenet operators can only be used on variables, not literals or expressions.
 
@@ -173,59 +171,59 @@ Some arithmetic operators only has one operand.
 
 Assignment operations are used to assign variables with value.
 
-| Operator | Name | Description | Format |
-|:--------:|:-----|:-----------:|:------:|
-| = | Normal Assignment | Assigns a value to a variable | A = B |
-| += | Addition Assignment | Assigns a variable the sum of itself and another value | A += B |
-| -= | Subtraction Assignment | Assigns a variable the difference of itself and another value | A -= B |
-| *= | Multiplication Assignment | Assigns a variable the product of itself and another value | A *= B |
-| /= | Division Assignment | Assigns a variable the quotient of itself and another value | A /= B |
-| %= | Modulo Assigment | Assigns a variable the remainder of the division of itself and another value | A %= B |
+| Operator | Name                      |                                 Description                                  | Format |
+|:--------:|:--------------------------|:----------------------------------------------------------------------------:|:------:|
+|    =     | Normal Assignment         |                        Assigns a value to a variable                         | A = B  |
+|    +=    | Addition Assignment       |            Assigns a variable the sum of itself and another value            | A += B |
+|    -=    | Subtraction Assignment    |        Assigns a variable the difference of itself and another value         | A -= B |
+|    *=    | Multiplication Assignment |          Assigns a variable the product of itself and another value          | A *= B |
+|    /=    | Division Assignment       |         Assigns a variable the quotient of itself and another value          | A /= B |
+|    %=    | Modulo Assigment          | Assigns a variable the remainder of the division of itself and another value | A %= B |
 
 ### Comparison Operators
 
 Comparison operators compare two numerical values and evaluates either `true` or `false`.
 
-| Operator | Name | Description | Format |
-|:--------:|:-----|:-----------:|:------:|
-| == | Equals | Returns `true` if both values are numerically equal; otherwise returns `false` | A == B |
-| != | Not Equals | Returns `false` if both values are numerically equal; otherwise returns `true` | A != B |
-| > | Greater Than | Returns `true` if first value is numerically larger than second value; otherwise returns `false` | A > B |
-| < | Less Than | Returns `true` if first value is numerically smaller than second value; otherwise returns `false` | A < B |\
-| >= | Greater Than Or Equals | Returns `true` if first value is numerically larger than or equal to second value; otherwise returns `false` | A >= B |
-| <= | Less Than Or Equals | Returns `true` if first value is numerically smaller than or equal to second value; otherwise returns `false` | A <= B |
+| Operator | Name                   |                                                  Description                                                  | Format |
+|:--------:|:-----------------------|:-------------------------------------------------------------------------------------------------------------:|:------:|
+|    ==    | Equals                 |                Returns `true` if both values are numerically equal; otherwise returns `false`                 | A == B |
+|    !=    | Not Equals             |                Returns `false` if both values are numerically equal; otherwise returns `true`                 | A != B |
+|    >     | Greater Than           |       Returns `true` if first value is numerically larger than second value; otherwise returns `false`        | A > B  |
+|    <     | Less Than              |       Returns `true` if first value is numerically smaller than second value; otherwise returns `false`       | A < B  |\
+|    >=    | Greater Than Or Equals | Returns `true` if first value is numerically larger than or equal to second value; otherwise returns `false`  | A >= B |
+|    <=    | Less Than Or Equals    | Returns `true` if first value is numerically smaller than or equal to second value; otherwise returns `false` | A <= B |
 
 ### Logical Operators
 
 Logical operators compare boolean values and evaluate to true or false.
 
-| Operator | Name | Description | Format |
-|:--------:|:-----|:-----------:|:------:|
-| not | Logical NOT | Unary operator, inverses the truth value of a boolean variable or literal | not A |
-| and | Logical AND | Returns `true` if both values are `true`; otherwise returns `false` | A and B |
-| nand | Logical NAND | Returns `false` if both values are `true`; otherwise returns `true` | A and B |
-| or | Logical OR | Returns `true` if at least one value is `true`; otherwise returns `false` | A or B |
-| nor | Logical NOR | Returns `true` if both values are `false`; otherwise returns `false` | A nor B |
-| xor | Logical XOR | Returns `true` only if values are different; otherwise returns `false` | A xor B |
-| xnor | Logical XNOR | Returns `true` only if values are the same; otherwise returns `false` | A xnor B |
+| Operator | Name         |                                Description                                |  Format  |
+|:--------:|:-------------|:-------------------------------------------------------------------------:|:--------:|
+|   not    | Logical NOT  | Unary operator, inverses the truth value of a boolean variable or literal |  not A   |
+|   and    | Logical AND  |    Returns `true` if both values are `true`; otherwise returns `false`    | A and B  |
+|   nand   | Logical NAND |    Returns `false` if both values are `true`; otherwise returns `true`    | A and B  |
+|    or    | Logical OR   | Returns `true` if at least one value is `true`; otherwise returns `false` |  A or B  |
+|   nor    | Logical NOR  |   Returns `true` if both values are `false`; otherwise returns `false`    | A nor B  |
+|   xor    | Logical XOR  |  Returns `true` only if values are different; otherwise returns `false`   | A xor B  |
+|   xnor   | Logical XNOR |   Returns `true` only if values are the same; otherwise returns `false`   | A xnor B |
 
 ### Order of Precedence
 
 When an expression contains two or more operations, certain operators are evaluated first before the others. Porado has an order of precedence for operators to determine which gets evaluated first to ensure the result is correct and accurate.
 
-| Precedence | Operation | Note |
-|:----------:|:---------:|:-----:|
-| 1 | `( )` | Expression inside the parenthesis is evaluated first |
-| 2 | `++`, `--`, `-` | This is the negative symbol, not subtraction |
-| 3 | `*`, `/`, `%` | - |
-| 4 | `+`, `-` | - |
-| 5 | `>`, `<`, `>=`, `<=` | - |
-| 6 | `==`, `!=` | - |
-| 7 | `not` | - |
-| 8 | `and`, `nand` | - |
-| 9 | `xor`, `xnor` | - |
-| 10 | `or`, `nor` | - |
-| 11 | `=` | - |
+| Precedence |      Operation       |                         Note                         |
+|:----------:|:--------------------:|:----------------------------------------------------:|
+|     1      |        `( )`         | Expression inside the parenthesis is evaluated first |
+|     2      |   `++`, `--`, `-`    |     This is the negative symbol, not subtraction     |
+|     3      |    `*`, `/`, `%`     |                          -                           |
+|     4      |       `+`, `-`       |                          -                           |
+|     5      | `>`, `<`, `>=`, `<=` |                          -                           |
+|     6      |      `==`, `!=`      |                          -                           |
+|     7      |        `not`         |                          -                           |
+|     8      |    `and`, `nand`     |                          -                           |
+|     9      |    `xor`, `xnor`     |                          -                           |
+|     10     |     `or`, `nor`      |                          -                           |
+|     11     |         `=`          |                          -                           |
 
 ## Conditionals
 
@@ -508,28 +506,6 @@ A `repeat` loop can be written using the format:
 ```js
 repeat (<integer>) {
     // Code is iterated a number of times equal to the integer...
-}
-```
-
-An iteration variable can optionally be added to keep track of iterations. To include an iteration variable, use the `with` keyword followed by the variable declaration. The iteration variable must be of type `int`.
-
-A starting point can be defined by initializing the iteration variable to a number, or not initializing to use the default value of 0.
-
-```js
-repeat (<integer>) with <variable-declaration> {
-    // Code is iterated a number of times equal to the integer...
-}
-```
-
-```js
-repeat (5) with i as int {
-    print(i); // 0, 1, 2, 3, 4
-}
-```
-
-```js
-repeat (5) with i as int = 3 {
-    print(i); // 3, 4, 5, 6, 7
 }
 ```
 

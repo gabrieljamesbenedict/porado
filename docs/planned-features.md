@@ -106,3 +106,24 @@ nums = [6,7,8,9,0] // No error: only the elements are immutable
 
 ***
 
+An iteration variable can optionally be added to keep track of iterations. To include an iteration variable, use the `with` keyword followed by the variable declaration. The iteration variable must be of type `int`.
+
+A starting point can be defined by initializing the iteration variable to a number, or not initializing to use the default value of 0.
+
+```js
+repeat (<integer>) with <variable-declaration> {
+    // Code is iterated a number of times equal to the integer...
+}
+```
+
+```js
+repeat (5) with i as int {
+    print(i); // 0, 1, 2, 3, 4
+}
+```
+
+```js
+repeat (5) with i as int = 3 {
+    print(i); // 3, 4, 5, 6, 7
+}
+```
