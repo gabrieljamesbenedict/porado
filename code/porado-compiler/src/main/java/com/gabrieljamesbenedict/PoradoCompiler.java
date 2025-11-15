@@ -1,6 +1,7 @@
 package com.gabrieljamesbenedict;
 
 import com.gabrieljamesbenedict.Exceptions.CompileException;
+import com.gabrieljamesbenedict.IntermediateCodeGeneration.IntermediateCodeGenerator;
 import com.gabrieljamesbenedict.LexicalAnalysis.LexicalAnalyzer;
 import com.gabrieljamesbenedict.LexicalAnalysis.Token;
 import com.gabrieljamesbenedict.SyntaxAnalysis.AbstractSyntaxTree;
@@ -56,6 +57,9 @@ public class PoradoCompiler
 
                 System.out.println("AST:");
                 ast.print();
+
+                IntermediateCodeGenerator icg = new IntermediateCodeGenerator();
+
 
             } catch (FileNotFoundException e) {
                 System.out.println("Error: Cannot find file \"" + file.getName() + "\"");
