@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -31,12 +32,13 @@ public class PoradoInterpreter {
 
                 StringWriter sw = new StringWriter();
                 reader.transferTo(sw);
-                Stream<Character> charStream = sw
+                List<Character> charList = sw
                         .toString()
                         .chars()
-                        .mapToObj(c -> (char) c);
+                        .mapToObj(c -> (char) c)
+                        .collect(Collectors.toList());
 
-                LexicalAnalyzer lexer = new LexicalAnalyzer(charStream);
+                LexicalAnalyzer lexer = new LexicalAnalyzer(charList);
 
                 lexer.tokenize().forEach(System.out::println);
 

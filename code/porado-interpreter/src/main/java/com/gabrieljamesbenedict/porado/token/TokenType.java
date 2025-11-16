@@ -8,7 +8,11 @@ public enum TokenType {
     LINEFEED,
     CARRIAGE_RETURN,
 
-    IDENTIFER,
+    KEYWORD_PRINT,
+    KEYWORD_BREAK,
+    KEYWORD_CONTINUE,
+
+    IDENTIFIER,
 
     KEYWORD_AS,
     KEYWORD_ARRAY,
@@ -109,6 +113,10 @@ public enum TokenType {
             case "false" -> LITERAL_FALSE;
             case "true" -> LITERAL_TRUE;
 
+            case "print" -> KEYWORD_PRINT;
+            case "break" -> KEYWORD_BREAK;
+            case "continue" -> KEYWORD_CONTINUE;
+
             case "as" -> KEYWORD_AS;
             case "array" -> KEYWORD_ARRAY;
             case "of" -> KEYWORD_OF;
@@ -168,7 +176,7 @@ public enum TokenType {
             case ":" -> DELIMITER_COLON;
             case ";" -> DELIMITER_SEMICOLON;
 
-            default -> IDENTIFER;
+            default -> IDENTIFIER;
         };
     }
 

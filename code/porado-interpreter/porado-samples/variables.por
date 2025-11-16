@@ -1,5 +1,3 @@
-num as int;
-price as float;
-grade as char;
-name as string;
-isDay as boolean;
+// Variable Declaration
+num as int = 1+2+3+4+5;
+price as float = 3.99 + 0.01;
