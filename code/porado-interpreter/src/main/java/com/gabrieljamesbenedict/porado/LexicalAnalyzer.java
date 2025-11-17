@@ -26,15 +26,17 @@ public class LexicalAnalyzer {
         while (it.hasNext()) {
             char c = it.next();
 
-            if (c == '/') {
-                if (it.peek() == '/') {
-                    while (!sb.toString().endsWith("\n")) {
-                        sb.append(it.next());
-                    }
-                } else if (it.peek() == '*') {
-                    while (!sb.toString().endsWith("*/")) {
-                        sb.append(it.next());
-                    }
+            if (c == '/' && it.peek() == '/') {
+                while (!sb.toString().endsWith("\n")) {
+                    sb.append(it.next());
+                }
+                System.out.println("Comment: /" + sb);
+                sb.setLength(0);
+                continue;
+
+            } else if (c == '/' && it.peek() == '*') {
+                while (!sb.toString().endsWith("*/")) {
+                    sb.append(it.next());
                 }
                 System.out.println("Comment: /" + sb);
                 sb.setLength(0);
@@ -75,7 +77,6 @@ public class LexicalAnalyzer {
             case '\r' -> createToken("\\r");
             default -> createToken(String.valueOf(c));
         }
-
     }
 
 }
