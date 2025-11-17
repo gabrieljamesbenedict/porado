@@ -1,13 +1,17 @@
 package com.gabrieljamesbenedict.porado.util;
 
-import java.util.Collection;
-import java.util.Iterator;
+import com.gabrieljamesbenedict.porado.token.Token;
+
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PeekableIterator<T> implements Iterator<T> {
 
     private final Collection<T> collection;
 
+    // Constructor
     public PeekableIterator(Collection<T> collection) {
         this.collection = collection;
     }
@@ -39,7 +43,7 @@ public class PeekableIterator<T> implements Iterator<T> {
     }
 
     public T ahead(int n) {
-        return n == 1? peek()
+        return n == 0? peek()
         : collection.stream().skip(n).limit(1).findFirst().orElse(null);
     }
 }
