@@ -1,11 +1,7 @@
 package com.gabrieljamesbenedict.porado.util;
 
-import com.gabrieljamesbenedict.porado.token.Token;
-
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PeekableIterator<T> implements Iterator<T> {
 
