@@ -29,7 +29,7 @@ public class TokenPostProcessor {
         return this;
     }
 
-    public TokenPostProcessor mergeTokens(Token resultToken, TokenType... types) {
+    public TokenPostProcessor mergeTokens(String lexeme, TokenType type, TokenType... types) {
         if (types.length < 2) throw new IllegalArgumentException("");
 
         PeekableIterator<Token> it = new PeekableIterator<>(new ArrayList<>(tokenStream.toList()));
@@ -39,7 +39,6 @@ public class TokenPostProcessor {
         Token[] next = new Token[typeSize];
 
         while (it.hasNext()) {
-
             boolean nextMatch = true;
             for (int i = 0; i < typeSize; i++) {
                 next[i] = it.ahead(i);
@@ -48,7 +47,8 @@ public class TokenPostProcessor {
             }
 
             if (nextMatch) {
-                accumulator.add(new Token(resultToken));
+                assert next[0] != null;
+                accumulator.add(new Token(lexeme, type, next[0].col, next[0].row));
                 for (int i = 0; i < typeSize; i++) {
                     it.next();
                 }
@@ -56,7 +56,6 @@ public class TokenPostProcessor {
             }
 
             accumulator.add(it.next());
-
        }
 
         tokenStream = accumulator.stream();
