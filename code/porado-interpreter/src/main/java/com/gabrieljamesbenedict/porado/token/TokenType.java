@@ -92,11 +92,8 @@ public enum TokenType {
     ERROR,
     EOF;
 
-    public static boolean isWhitespace(TokenType type) {
-        return
-                type == WHITESPACE
-                || type == LINEFEED
-                || type == CARRIAGE_RETURN;
+    public static TokenType[] getAllTypes () {
+        return new TokenType[] {TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING, TYPE_BOOLEAN};
     }
 
     public static TokenType mapToType (String s) {
