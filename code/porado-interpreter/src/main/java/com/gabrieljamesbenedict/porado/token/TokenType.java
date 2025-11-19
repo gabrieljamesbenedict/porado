@@ -96,6 +96,10 @@ public enum TokenType {
         return new TokenType[] {TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING, TYPE_BOOLEAN};
     }
 
+    public static TokenType[] getAllLiterals () {
+        return new TokenType[] {LITERAL_INT, LITERAL_FLOAT, LITERAL_CHAR, LITERAL_STRING, LITERAL_TRUE, LITERAL_FALSE};
+    }
+
     public static TokenType mapToType (String s) {
         return switch (s) {
 
