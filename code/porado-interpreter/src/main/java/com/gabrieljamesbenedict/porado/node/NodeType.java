@@ -4,7 +4,9 @@ public enum NodeType {
     Program,
 
     BLOCK_STATEMENT,
-    SINGLE_STATEMENT,
+
+    PRINT,
+    DECLARATION,
 
     EOF
 }
