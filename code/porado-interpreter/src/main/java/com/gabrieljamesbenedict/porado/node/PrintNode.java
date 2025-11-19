@@ -7,6 +7,6 @@ public class PrintNode extends SingleStatementNode {
 
     @Getter
     @Setter
-    private StatementNode printStatement;
+    private ExpressionNode printExpression;
 
 }

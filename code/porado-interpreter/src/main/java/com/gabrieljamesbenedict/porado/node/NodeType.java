@@ -8,5 +8,5 @@ public enum NodeType {
     PRINT,
     DECLARATION,
 
-    EOF
+    VARIABLE_DECLARATION, EOF
 }
