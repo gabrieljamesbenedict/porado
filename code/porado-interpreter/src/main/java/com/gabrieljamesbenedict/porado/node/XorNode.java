@@ -1,4 +1,4 @@
 package com.gabrieljamesbenedict.porado.node;
 
-public class XorNode extends ExpressionNode {
+public class XorNode extends BinaryExpressionNode {
 }

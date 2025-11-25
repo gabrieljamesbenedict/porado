@@ -1,6 +1,7 @@
 package com.gabrieljamesbenedict.porado;
 
 import com.gabrieljamesbenedict.porado.node.ProgramNode;
+import com.gabrieljamesbenedict.porado.node.StatementNode;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,8 @@ public class AbstractSyntaxTree {
     }
 
     public void print() {
-
-
-
+        int level = 1;
+        programNode.printNode(level);
     }
 
 }

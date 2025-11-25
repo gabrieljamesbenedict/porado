@@ -11,12 +11,12 @@ public class BinaryExpressionNode extends ExpressionNode {
 
     @Override
     public void printNode(int level) {
-        System.out.println(this.getText());
+        System.out.println("Operation: " + this.getText());
 
-        System.out.print(printIndent(level));
+        System.out.print(printIndent(level) + "Operand1: ");
         operand1.printNode(level + 1);
 
-        System.out.print(printIndent(level));
+        System.out.print(printIndent(level) + "Operand2: ");
         operand2.printNode(level + 1);
 
     }

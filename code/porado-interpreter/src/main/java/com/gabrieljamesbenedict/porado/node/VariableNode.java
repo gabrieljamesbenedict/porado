@@ -9,8 +9,16 @@ import lombok.Setter;
 public class VariableNode extends DeclarationNode {
 
     DataType dataType;
-    Object dataValue;
+    ExpressionNode dataValue = null;
 
-    boolean isDataFromIdentifier = false;
+    @Override
+    public void printNode(int level) {
+        System.out.println(this.text);
+        System.out.println(printIndent(level) + "Identifier: " + this.getIdentifier());
+        if (dataValue != null) {
+            System.out.print(printIndent(level) + "Value: ");
+            dataValue.printNode(level+1);
+        }
+    }
 
 }

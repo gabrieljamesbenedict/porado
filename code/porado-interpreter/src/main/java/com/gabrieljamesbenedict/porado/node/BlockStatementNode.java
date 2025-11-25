@@ -10,6 +10,15 @@ import java.util.ArrayList;
 @Setter
 public class BlockStatementNode extends StatementNode {
 
-    private final ArrayList<StatementNode> statements = new ArrayList<>();
+    private final ArrayList<SingleStatementNode> statements = new ArrayList<>();
+
+    @Override
+    public void printNode(int level) {
+        System.out.println(this.getText());
+        for (SingleStatementNode sn : statements) {
+            System.out.print(printIndent(level));
+            sn.printNode(level+1);
+        }
+    }
 
 }
