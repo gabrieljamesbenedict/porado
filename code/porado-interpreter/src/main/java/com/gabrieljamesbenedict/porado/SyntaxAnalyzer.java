@@ -8,6 +8,7 @@ import com.gabrieljamesbenedict.porado.util.ExpressionParser;
 import com.gabrieljamesbenedict.porado.util.PeekableIterator;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -168,12 +169,14 @@ public class SyntaxAnalyzer {
 
             if (match(TokenType.OPERATOR_ASSIGN)) {
                 it.next();
-                declarationNode.setDataValue(it.next().getLexeme());
-                if (matchAll(TokenType.getAllLiterals())) {
-                    declarationNode.setDataFromIdentifier(false);
-                } else if (match(TokenType.IDENTIFIER)) {
-                    declarationNode.setDataFromIdentifier(true);
-                }
+                // TODO: figure this out in the future lol
+//                declarationNode.setDataValue(it.next().getLexeme());
+//                if (matchAll(TokenType.getAllLiterals())) {
+//                    declarationNode.setDataFromIdentifier(false);
+//                } else if (match(TokenType.IDENTIFIER)) {
+//                    declarationNode.setDataFromIdentifier(true);
+//                }
+                declarationNode.setDataValue(expressionParser.parse());
             }
         }
 
@@ -199,12 +202,11 @@ public class SyntaxAnalyzer {
     }
 
     private boolean matchAll(TokenType... types) {
-        boolean match = true;
         TokenType peekType = it.peek().getType();
         for (TokenType t : types) {
-            match = match && (peekType == t);
+            if (peekType == t) return true;
         }
-        return match;
+        return false;
     }
 
     private boolean matchAhead(TokenType type, int ahead) {

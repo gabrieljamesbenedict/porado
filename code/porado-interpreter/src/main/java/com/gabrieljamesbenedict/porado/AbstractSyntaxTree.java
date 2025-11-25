@@ -20,4 +20,10 @@ public class AbstractSyntaxTree {
         return ast;
     }
 
+    public void print() {
+
+
+
+    }
+
 }

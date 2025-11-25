@@ -9,7 +9,8 @@ public class PeekableIterator<T> implements Iterator<T> {
 
     // Constructor
     public PeekableIterator(Collection<T> collection) {
-        this.collection = collection;
+        this.collection = new ArrayList<>();
+        this.collection.addAll(collection);
     }
 
     @Override

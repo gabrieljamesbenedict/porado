@@ -41,7 +41,7 @@ public class PoradoInterpreter {
                 LexicalAnalyzer lexer = new LexicalAnalyzer(charList);
                 SyntaxAnalyzer parser = new SyntaxAnalyzer(lexer.tokenize());
 
-                //lexer.tokenize().forEach(System.out::println);
+                lexer.tokenize().forEach(System.out::println);
                 AbstractSyntaxTree ast = parser.parse();
 
                 ast.print();
