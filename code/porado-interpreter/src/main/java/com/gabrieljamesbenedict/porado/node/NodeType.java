@@ -8,5 +8,27 @@ public enum NodeType {
     PRINT,
     DECLARATION,
 
+    ASSIGNMENT,
+    OR,
+    NOR,
+    XOR,
+    XNOR,
+    AND,
+    NAND,
+    EQUALS,
+    UNEQUALS,
+    GREATER,
+    GREATHERTHAN,
+    LESS,
+    LESSTHAN,
+
+    ADDITIVE,
+    MULTIPLICATIVE,
+
+    UNARY,
+
+    LITERAL,
+    IDENTIFIER,
+
     VARIABLE_DECLARATION, EOF
 }
