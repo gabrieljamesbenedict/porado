@@ -39,7 +39,7 @@ public class SyntaxAnalyzer {
         programNode.setText("Program");
         it.next();
 
-        if (!match(TokenType.EOF)) {
+        while (!match(TokenType.EOF)) {
             StatementNode statementNode =  parseStatement();
             programNode.getStatements().add(statementNode);
         }

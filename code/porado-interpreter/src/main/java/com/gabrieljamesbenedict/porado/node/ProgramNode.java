@@ -14,7 +14,6 @@ public class ProgramNode extends Node {
     public void printNode(int level) {
         System.out.println(this.getText());
         for (StatementNode sn : statements) {
-            System.out.println(sn.toString());
             System.out.print(printIndent(level));
             sn.printNode(level+1);
         }
