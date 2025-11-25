@@ -1,4 +1,4 @@
 package com.gabrieljamesbenedict.porado.node;
 
-public class InequalityNode extends ExpressionNode{
+public class InequalityNode extends BinaryExpressionNode{
 }

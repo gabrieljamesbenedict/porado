@@ -1,4 +1,4 @@
 package com.gabrieljamesbenedict.porado.node;
 
-public class MultiplyNode extends ExpressionNode{
+public class MultiplyNode extends BinaryExpressionNode{
 }
